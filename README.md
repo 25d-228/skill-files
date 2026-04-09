@@ -1,49 +1,28 @@
 # skill-files
 
-Version-controlled skill / prompt files for the AI agents I use.
+Version-controlled skill files shared across AI agents.
 
 ## Layout
 
-One folder per agent ecosystem:
+Each skill is a directory at the repo root with a `SKILL.md`:
 
 ```text
 skill-files/
-├── claude/
-│   └── skills/
-│       ├── development-plan/SKILL.md
-│       └── leetcode-explain/SKILL.md
-├── cursor/
-│   └── rules/
-│       └── <rule>.mdc
-└── codex/
-    └── prompts/
-        └── <prompt>.md
+├── beamer-slides/SKILL.md
+├── development-plan/SKILL.md
+└── leetcode-explain/SKILL.md
 ```
 
-- **Claude Code** → `claude/skills/<skill-name>/SKILL.md` ([format](https://code.claude.com/docs/en/skills))
-- **Cursor** → `cursor/rules/*.mdc` (project rules format)
-- **Codex CLI** → `codex/prompts/*.md` (custom prompts / slash commands)
+All agents point at the same directory — no per-agent copies.
 
 ## Symlink into each agent's config
 
-Run from the repo root so edits here go live without copying.
-
-**Claude Code** (personal skills):
+Run from the repo root:
 
 ```bash
-ln -s "$(pwd)/claude/skills" ~/.claude/skills
-```
-
-**Cursor** (global rules — symlink into a project's `.cursor/`):
-
-```bash
-ln -s "$(pwd)/cursor/rules" /path/to/project/.cursor/rules
-```
-
-**Codex CLI** (custom prompts):
-
-```bash
-ln -s "$(pwd)/codex/prompts" ~/.codex/prompts
+ln -s "$(pwd)" ~/.claude/skills    # Claude Code
+ln -s "$(pwd)" ~/.cursor/skills    # Cursor
+ln -s "$(pwd)" ~/.agents/skills    # Codex
 ```
 
 If the target path already exists, move it aside first — `ln -s` will not overwrite.
