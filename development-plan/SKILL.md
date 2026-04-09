@@ -45,7 +45,7 @@ A ` ```text ` block showing the current file layout. If scaffolding is part of t
 
 ## How to order phases
 
-The plan must follow the order a developer would naturally build the project. Apply these rules:
+The plan must follow **incremental construction**: each phase produces a working system that the next phase extends. At no point should the developer build everything at once. Every phase adds exactly one visible capability on top of what already works.
 
 ### Rule 1: Infrastructure before features
 
@@ -53,7 +53,7 @@ Set up the project skeleton, dependencies, build system, and dev tooling first. 
 
 ### Rule 2: Shared foundations before any feature that uses them
 
-Build shared layers — database schema, core types/models, auth, config, shared utilities — before any feature that depends on them. If multiple features share a foundation, that foundation is its own phase.
+Build shared layers — database schema, core types/models, auth, config, shared utilities — before any feature that depends on them. If multiple features share a foundation, that foundation is its own phase. Do not build all foundations at once — only introduce a foundation when the next feature needs it.
 
 ### Rule 3: Each feature follows its natural build order
 
@@ -71,15 +71,32 @@ This is the order things compile, run, and make sense. You cannot write a route 
 
 Never put two important features in the same phase. If a phase would contain more than one significant feature, split it into separate phases — one feature each. It is fine to increase the total number of phases. Minor helpers or small utilities can share a phase with a feature, but anything the user would recognize as a distinct capability gets its own phase.
 
-### Rule 5: Features ordered by dependency
+### Rule 5: Stack features — each phase builds on the last
 
-If feature B calls feature A, build A first. Map the dependency graph and linearize it. Independent features can be in any order, but prefer simpler features first — they build confidence and often reveal integration issues early.
+Arrange features so each phase **extends** the working system from the previous phase. The developer should be able to run and verify the system after every single phase.
 
-### Rule 6: Integration and polish after all features
+- If feature B calls feature A, build A first.
+- Map the dependency graph and linearize it into a stack: the simplest, most foundational feature at the bottom, the most complex or dependent feature at the top.
+- Prefer the order that lets the developer see tangible progress at each step — a feature that produces visible output early is a good foundation for features that refine or extend that output later.
+- Independent features can be in any order, but prefer simpler features first — they build confidence and often reveal integration issues early.
+
+**Anti-pattern:** Do not group all "backend" work into one phase and all "frontend" work into another. Instead, build one complete vertical slice (data → logic → UI for one feature), verify it works, then build the next slice on top.
+
+### Rule 6: Introduce complexity gradually
+
+Do not front-load the plan with all the hard parts. Arrange phases so that:
+
+- Early phases are small and self-contained — they establish patterns and prove the architecture works.
+- Middle phases add the core features one at a time, each building on the patterns established earlier.
+- Later phases tackle harder features that depend on multiple earlier ones.
+
+If a feature is large, split it into a basic version (earlier phase) and an enhanced version (later phase). The basic version should be functional on its own.
+
+### Rule 7: Integration and polish after all features
 
 Cross-cutting concerns (error handling, logging, auth guards, theming, settings, edge cases) come after the features they cut across. Testing at the integration/E2E level comes here too.
 
-### Rule 7: Ship last
+### Rule 8: Ship last
 
 Production build, packaging, deployment, smoke tests on the packaged result. Replace with **Deploy** or **Hand-off** for projects that don't ship a binary.
 
@@ -161,9 +178,10 @@ A heading `### Test method` at the end of each phase. Describe exactly how the p
 
 1. Read the repo. Check manifest files (`package.json`, `Cargo.toml`, `pyproject.toml`, `go.mod`, …) so the plan matches reality.
 2. List all features. For each feature, identify what it depends on (other features, shared foundations, external services).
-3. Draw the dependency graph mentally and linearize it: shared foundations first, then features in dependency order, then integration.
-4. Within each feature, order substeps by the natural build order: data → logic → interface → wiring → tests.
-5. Draft the phase list — titles and one-line goals only. Walk through it: can each phase be built and verified using only what came before? If not, reorder.
-6. Fill in substeps. For each one ask: what command? what does it produce? how do I prove it? If you can't answer all three, break it down further.
-7. Write the plan with the Write tool. Default path: `<project-name>-development-plan.md` at the repo root.
-8. After writing, send a chat summary under 10 lines: file path, phase titles, and which phase to start with.
+3. Draw the dependency graph and linearize it into a stack: the simplest standalone feature at the bottom, features that extend earlier ones above. Each feature should clearly build on what the previous phase delivered.
+4. Check the stack: after completing phase N, does the system work and do something useful? Can the developer demo it? If a phase leaves the system in a broken or half-finished state, merge it with the next phase or split differently.
+5. Within each feature, order substeps by the natural build order: data → logic → interface → wiring → tests.
+6. Draft the phase list — titles and one-line goals only. Walk through it: can each phase be built and verified using only what came before? Does each phase add exactly one visible capability? If not, reorder or split.
+7. Fill in substeps. For each one ask: what command? what does it produce? how do I prove it? If you can't answer all three, break it down further.
+8. Write the plan with the Write tool. Default path: `<project-name>-development-plan.md` at the repo root.
+9. After writing, send a chat summary under 10 lines: file path, phase titles, and which phase to start with.
