@@ -7,7 +7,7 @@ allowed-tools: Read Glob Grep Write
 
 # Development Plan
 
-Write a phased development plan that is detailed enough to follow step by step.
+Write a development plan that follows the order a developer would actually build things — foundation first, then each feature built bottom-up through its logical layers.
 
 ## Before writing
 
@@ -28,12 +28,11 @@ Every plan has these sections, in order:
 
 ## What this project is
 ## Repository layout
-## Phase 1 — Bootstrap
-## Phase 2 — First run
-## Phase 3..N — Feature phases
-## Phase N+1 — Polish
-## Phase N+2 — Testing
-## Phase N+3 — Ship
+## Phase 1 — Project setup
+## Phase 2 — Core foundation
+## Phase 3..N — Feature phases (one per feature, in dependency order)
+## Phase N+1 — Integration & polish
+## Phase N+2 — Ship
 ## Daily workflow
 ## Risks & mitigations
 ```
@@ -46,17 +45,53 @@ Every plan has these sections, in order:
 
 A ` ```text ` block showing the current file layout. If scaffolding is part of the plan, add a second block showing the post-scaffold layout. State where commands should be run from.
 
-## Phases
+## How to order phases
 
-Order phases by dependency — each must be verifiable using only earlier phases. Each phase has the following pieces, in order.
+The plan must follow the order a developer would naturally build the project. Apply these rules:
+
+### Rule 1: Infrastructure before features
+
+Set up the project skeleton, dependencies, build system, and dev tooling first. Nothing else works without this. Mark DONE if the project already exists, and add a re-verify recipe.
+
+### Rule 2: Shared foundations before any feature that uses them
+
+Build shared layers — database schema, core types/models, auth, config, shared utilities — before any feature that depends on them. If multiple features share a foundation, that foundation is its own phase.
+
+### Rule 3: Each feature follows its natural build order
+
+Within each feature phase, substeps follow the order a developer would write the code:
+
+1. **Data layer** — schema, models, migrations, seed data
+2. **Logic layer** — business rules, services, transformations, validation
+3. **Interface layer** — API routes, CLI commands, UI components, event handlers
+4. **Wiring** — connect the layers, register routes, bind events
+5. **Feature tests** — test the feature end-to-end while it is fresh
+
+This is the order things compile, run, and make sense. You cannot write a route handler before the service it calls exists. You cannot write a service before the data model it operates on exists. Follow this order in every feature phase.
+
+### Rule 4: Features ordered by dependency
+
+If feature B calls feature A, build A first. Map the dependency graph and linearize it. Independent features can be in any order, but prefer simpler features first — they build confidence and often reveal integration issues early.
+
+### Rule 5: Integration and polish after all features
+
+Cross-cutting concerns (error handling, logging, auth guards, theming, settings, edge cases) come after the features they cut across. Testing at the integration/E2E level comes here too.
+
+### Rule 6: Ship last
+
+Production build, packaging, deployment, smoke tests on the packaged result. Replace with **Deploy** or **Hand-off** for projects that don't ship a binary.
+
+## Phase format
+
+Each phase has the following pieces, in order.
 
 ### 1. Phase header
 
 A heading `## Phase N — <title>` followed by a one-sentence **Goal** in bold.
 
-> ## Phase 3 — HTTP server skeleton
+> ## Phase 3 — User authentication
 >
-> **Goal:** A request to `/health` returns a JSON response.
+> **Goal:** A user can register, log in, and receive a session token.
 
 ### 2. "What gets built in this phase" block
 
@@ -64,9 +99,15 @@ A bullet list of every file the phase creates or changes, with every function or
 
 > **What gets built in this phase:**
 >
-> - `server.ts` — Starts the web server when the app launches.
->   - `startServer` — Opens a port and listens for requests.
->   - `healthRoute` — Replies "ok" so we can tell the server is alive.
+> - `models/user.py` — Defines what a user looks like in the database.
+>   - `User` — Stores a user's email, hashed password, and creation date.
+> - `services/auth.py` — Handles the rules for signing up and logging in.
+>   - `register_user` — Creates a new user account after checking the email is not taken.
+>   - `authenticate` — Checks the password and returns a session token.
+> - `routes/auth.py` — Exposes sign-up and login as API endpoints.
+>   - `POST /register` — Accepts email and password, creates the account.
+>   - `POST /login` — Accepts email and password, returns a token.
+> - `tests/test_auth.py` — Proves registration and login work correctly.
 
 Good: "Turns a pair of line numbers into something the editor can highlight."
 Bad: "Returns a `vscode.Range` from two integer parameters."
@@ -75,7 +116,7 @@ If the phase adds settings, commands, or config keys, list those too in the same
 
 ### 3. Substeps
 
-Number them `N.1`, `N.2`, … so the user can say "do 3.4 for me". Each substep has:
+Number them `N.1`, `N.2`, … so the user can say "do 3.4 for me". Order substeps by the natural build order (data → logic → interface → wiring → tests). Each substep has:
 
 - A short heading and 1–3 sentences describing what to do.
 - An exact command in a fenced ` ```bash ` block. If the action is editing a file, name the file and the change.
@@ -97,17 +138,6 @@ A heading `### If verification fails` followed by a small table:
 | <observed failure> | <what to look at first>  |
 
 3–5 rows covering the most likely failure modes for that phase.
-
-## Required phases
-
-Every plan has these, in order:
-
-1. **Bootstrap** — set up an empty buildable project. Mark DONE if it already exists, and add a re-verify recipe.
-2. **First run** — make sure the empty project actually runs. This is the base for every later verify step.
-3. **Feature phases** — one phase per chunk of work, ordered by dependency.
-4. **Polish** — UX, theming, settings, edge cases.
-5. **Testing** — unit and integration tests. Say what each test covers.
-6. **Ship** — production build, packaging, smoke test on the packaged result. Replace with **Deploy** or **Hand-off** for projects that don't ship a binary.
 
 ## Daily workflow section
 
@@ -149,7 +179,10 @@ A 3–6 row table. Each risk specific to this project, each mitigation a concret
 ## How to write the plan
 
 1. Read the repo. Check manifest files (`package.json`, `Cargo.toml`, `pyproject.toml`, `go.mod`, …) so the plan matches reality.
-2. Draft the phase list first — titles and one-line goals only. Verify the order: each phase reachable using only earlier phases.
-3. Fill in substeps. For each one ask: what command? what does it produce? how do I prove it? If you can't answer all three, break it down further.
-4. Write the plan with the Write tool. Default path: `<project-name>-development-plan.md` at the repo root.
-5. After writing, send a chat summary under 10 lines: file path, phase titles, and which phase to start with.
+2. List all features. For each feature, identify what it depends on (other features, shared foundations, external services).
+3. Draw the dependency graph mentally and linearize it: shared foundations first, then features in dependency order, then integration.
+4. Within each feature, order substeps by the natural build order: data → logic → interface → wiring → tests.
+5. Draft the phase list — titles and one-line goals only. Walk through it: can each phase be built and verified using only what came before? If not, reorder.
+6. Fill in substeps. For each one ask: what command? what does it produce? how do I prove it? If you can't answer all three, break it down further.
+7. Write the plan with the Write tool. Default path: `<project-name>-development-plan.md` at the repo root.
+8. After writing, send a chat summary under 10 lines: file path, phase titles, and which phase to start with.
