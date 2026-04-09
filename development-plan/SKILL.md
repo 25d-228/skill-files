@@ -33,8 +33,6 @@ Every plan has these sections, in order:
 ## Phase 3..N — Feature phases (one per feature, in dependency order)
 ## Phase N+1 — Integration & polish
 ## Phase N+2 — Ship
-## Daily workflow
-## Risks & mitigations
 ```
 
 ### What this project is
@@ -69,15 +67,19 @@ Within each feature phase, substeps follow the order a developer would write the
 
 This is the order things compile, run, and make sense. You cannot write a route handler before the service it calls exists. You cannot write a service before the data model it operates on exists. Follow this order in every feature phase.
 
-### Rule 4: Features ordered by dependency
+### Rule 4: One important feature per phase
+
+Never put two important features in the same phase. If a phase would contain more than one significant feature, split it into separate phases — one feature each. It is fine to increase the total number of phases. Minor helpers or small utilities can share a phase with a feature, but anything the user would recognize as a distinct capability gets its own phase.
+
+### Rule 5: Features ordered by dependency
 
 If feature B calls feature A, build A first. Map the dependency graph and linearize it. Independent features can be in any order, but prefer simpler features first — they build confidence and often reveal integration issues early.
 
-### Rule 5: Integration and polish after all features
+### Rule 6: Integration and polish after all features
 
 Cross-cutting concerns (error handling, logging, auth guards, theming, settings, edge cases) come after the features they cut across. Testing at the integration/E2E level comes here too.
 
-### Rule 6: Ship last
+### Rule 7: Ship last
 
 Production build, packaging, deployment, smoke tests on the packaged result. Replace with **Deploy** or **Hand-off** for projects that don't ship a binary.
 
@@ -125,53 +127,32 @@ Number them `N.1`, `N.2`, … so the user can say "do 3.4 for me". Order substep
 
 Use [path/to/file](path/to/file) markdown links for file references. No time estimates.
 
-### 4. End-of-phase verification
+### 4. Test method
 
-A heading `### Verify (end of phase)` followed by a 3–5 item checklist that proves the phase goal is met.
+A heading `### Test method` at the end of each phase. Describe exactly how the phase's output is tested:
 
-### 5. Failure triage table
+- **What to test** — the specific behaviors or contracts introduced in this phase.
+- **How to test** — the testing approach (unit tests, integration tests, manual smoke test, CLI invocation, curl commands, UI walkthrough, etc.) with concrete commands or steps.
+- **Expected result** — what a passing run looks like (exit code, output snippet, UI state).
 
-A heading `### If verification fails` followed by a small table:
-
-| Symptom            | Check                    |
-|--------------------|--------------------------|
-| <observed failure> | <what to look at first>  |
-
-3–5 rows covering the most likely failure modes for that phase.
-
-## Daily workflow section
-
-A small table for after Phase 2:
-
-| Action    | How |
-|-----------|-----|
-| Edit code | …   |
-| Rebuild   | …   |
-| Run tests | …   |
-| Lint      | …   |
-
-## Risks & mitigations section
-
-A 3–6 row table. Each risk specific to this project, each mitigation a concrete fix.
-
-| Risk     | Mitigation |
-|----------|------------|
-| <risk>   | <fix>      |
+> ### Test method
+>
+> **What to test:** Registration rejects duplicate emails; login returns a valid JWT.
+>
+> **How to test:**
+> ```bash
+> pytest tests/test_auth.py -v
+> ```
+>
+> **Expected result:** All 4 tests pass. `test_duplicate_email` returns 409. `test_login_success` response body contains a `token` field.
 
 ## Style rules
 
 - Plain, direct language. Short sentences.
 - Imperative voice: "Run `npm install`", not "you should run npm install".
 - Concrete over abstract: name the exact command, file, or field.
-- Tables for prerequisites, daily workflow, failure triage, and risks. Numbered lists for ordered steps. Bullets for unordered options.
-- **Tables must be padded** (columns aligned with spaces in the source). The plan file is committed to the repo, so raw markdown should be readable in a plain text editor — not just in the rendered view. Example:
-
-  ```markdown
-  | Action    | How |
-  |-----------|-----|
-  | Edit code | …   |
-  | Rebuild   | …   |
-  ```
+- Tables for prerequisites. Numbered lists for ordered steps. Bullets for unordered options.
+- **Tables must be padded** (columns aligned with spaces in the source). The plan file is committed to the repo, so raw markdown should be readable in a plain text editor — not just in the rendered view.
 - Type every code fence (` ```bash `, ` ```json `, ` ```text `). Never untyped.
 - No emojis unless asked.
 - Markdown links for file references.
