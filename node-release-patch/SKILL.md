@@ -17,6 +17,7 @@ This skill is generic — it works for plain npm packages, VS Code extensions, C
 - **Only bump major (`x.y.z` → `(x+1).0.0`) if the user is extremely explicit** — e.g. "1.0 release", "ship 1.0", "major bump", "breaking release". When in doubt, ask.
 - **Never change `version` to anything the user didn't ask for.** If they say "0.3.0", use exactly `0.3.0`. If they say "patch", compute `z+1`.
 - **Respect pre-release tags.** If the current version is `1.2.3-beta.4`, ask the user what they want — bumping pre-release tags is not a patch bump and the convention varies by project.
+- **First release starts at `0.0.0`.** If no prior build artifact exists in the repo (no `.vsix`, no `.tgz`, no matching `<name>-*.zip` — whatever this project produces), this is the first release. Set the version to exactly `0.0.0` instead of bumping, regardless of what `package.json` currently says. Do not bump to `0.0.1`, and do not start at `0.1.0` or `1.0.0`. The *next* run of this skill will bump `0.0.0` → `0.0.1` naturally.
 
 When unsure whether the user wants a patch or a feature bump, ask before editing `package.json`.
 
@@ -35,6 +36,16 @@ Read `package.json`. Note:
 - The `"scripts"` object — find the build/package script (see step 4).
 - The `"devDependencies"` — look for `@vscode/vsce` (VS Code extension), `electron-builder`, or other packagers that influence what the final artifact is.
 - The `"private": true` flag — if present, `npm pack` still works but the project isn't meant for npm publish. That's fine for this skill.
+
+Then check whether a prior build artifact exists at the repo root:
+
+```bash
+ls *.vsix *.tgz 2>/dev/null
+```
+
+If nothing matches — no `.vsix`, no `.tgz`, no prior artifact of any kind — this is a first release. Set the target version to exactly `0.0.0` (see the first-release rule above). Skip the "bump" arithmetic entirely; you are not bumping, you are establishing the starting version. If `package.json` already has a version like `0.0.1` or `1.2.3`, overwrite it with `0.0.0` for this run — the first-release rule takes precedence over whatever arbitrary starting value the project scaffolded with.
+
+If any prior artifact does exist, proceed with the normal bump arithmetic against the `package.json` version.
 
 ### 2. Confirm the plan
 
