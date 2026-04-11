@@ -51,6 +51,19 @@ The plan must follow **incremental construction**: each phase produces a working
 
 Set up the project skeleton, dependencies, build system, and dev tooling first. Nothing else works without this. Mark DONE if the project already exists, and add a re-verify recipe.
 
+**Always isolate the project in a managed environment.** Phase 1 must pin a language version and create an isolated environment before installing any dependency. Pick the tool that matches the stack:
+
+| Stack              | Tool                   | What to pin / create                           |
+| ------------------ | ---------------------- | ----------------------------------------------- |
+| Python             | `uv`                   | `uv init`, `uv python pin <version>`, `uv venv` |
+| Node.js / TS       | `nvm` + `pnpm`/`npm`   | `.nvmrc`, `nvm use`, lockfile committed         |
+| Rust               | `rustup`               | `rust-toolchain.toml`                           |
+| Go                 | `go.mod`               | `go 1.XX` directive                             |
+| Ruby               | `rbenv` / `asdf`       | `.ruby-version`, `bundle install`               |
+| Other              | `asdf` or `mise`       | `.tool-versions`                                |
+
+The phase must include the exact command to create the environment, the command to activate it, and a **Verify:** step that prints the resolved interpreter path or version (e.g. `uv run python -c "import sys; print(sys.executable)"`, `node -v`, `which python`). Every later phase assumes commands run inside this environment — do not install packages globally.
+
 ### Rule 2: Shared foundations before any feature that uses them
 
 Build shared layers — database schema, core types/models, auth, config, shared utilities — before any feature that depends on them. If multiple features share a foundation, that foundation is its own phase. Do not build all foundations at once — only introduce a foundation when the next feature needs it.
