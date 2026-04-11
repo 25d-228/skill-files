@@ -9,6 +9,7 @@ Each skill is a directory at the repo root with a `SKILL.md`:
 ```text
 skill-files/
 ├── beamer-slides/SKILL.md
+├── commit-split/SKILL.md
 ├── development-plan/SKILL.md
 └── leetcode-explain/SKILL.md
 ```
