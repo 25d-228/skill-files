@@ -11,7 +11,8 @@ skill-files/
 ├── beamer-slides/SKILL.md
 ├── commit-split/SKILL.md
 ├── development-plan/SKILL.md
-└── leetcode-explain/SKILL.md
+├── leetcode-explain/SKILL.md
+└── node-release-patch/SKILL.md
 ```
 
 All agents point at the same directory — no per-agent copies.
