@@ -19,6 +19,24 @@ Ask nothing the repo can already answer. Run these first:
 
 Do not start committing until you can say one sentence about what every change in the working tree does. Unknown changes might be the user's in-progress work, and committing what you don't understand is how you lose it.
 
+## Update the README if the changes make it stale
+
+If the repo has a README at the root (`README.md`, `README.rst`, `README`, or similar), open it *before* you start committing and check whether the current working tree makes it outdated. A README that lists files, skills, modules, commands, or features is an index — when the working tree adds, renames, or removes one of those, the README lies until it's updated.
+
+What to look for:
+
+- **New top-level entries** the README would normally list — a new file, skill, module, subcommand, or subdirectory.
+- **Renames and removals** — if a listed entry disappeared or moved, the README still points at the old name.
+- **New user-visible behavior** — a new flag, a new entry point, a changed default that the README documents.
+
+If the README is stale, edit it as part of the working tree *before* committing. The README update then rides in the commit whose change made it stale, per Rule 3 (docs travel with the change that motivated them) — do not create a separate "update README" commit, and do not leave the stale README behind to fix "later".
+
+Do not touch the README if:
+
+- The repo has no root README.
+- The changes are internal refactors, bug fixes, or test-only work that the README doesn't document.
+- The README is already accurate — don't rewrite it for style.
+
 ## How to group commits
 
 Group by **concern**, not by file. Aim for 2–5 commits for a typical mixed working tree. Fewer than 2 means you weren't asked to split. More than 5 usually means you're slicing too finely or the working tree genuinely has that much unrelated work.
