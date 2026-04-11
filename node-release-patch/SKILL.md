@@ -151,4 +151,4 @@ One or two sentences. Tell the user:
 1. The old version and new version.
 2. The absolute path to the produced artifact.
 
-Example: *"Packaged `ask-markdown-0.2.2.vsix` (bumped from 0.2.1). File is at `/Users/ip33/Documents/GitHub/ask-markdown/ask-markdown-0.2.2.vsix`."*
+Example: *"Packaged `ask-markdown-0.2.2.vsix` (bumped from 0.2.1). File is at `/absolute/path/to/ask-markdown-0.2.2.vsix`."*
