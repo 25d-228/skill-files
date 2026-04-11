@@ -39,7 +39,9 @@ Do not touch the README if:
 
 ## How to group commits
 
-Group by **concern**, not by file. Aim for 2–5 commits for a typical mixed working tree. Fewer than 2 means you weren't asked to split. More than 5 usually means you're slicing too finely or the working tree genuinely has that much unrelated work.
+Group by **concern**, not by file. Aim for 2–5 commits for a typical mixed working tree. More than 5 usually means you're slicing too finely or the working tree genuinely has that much unrelated work.
+
+**If the working tree is one concern, that's one commit — make it anyway.** Do not stop and tell the user "there's nothing to split" and wait for permission. The user invoked the skill to get their changes committed; a single logical change is still a valid outcome. Announce the one commit you're about to make and proceed, same as you would for N > 1.
 
 ### Rule 1: One concern per commit
 
@@ -169,7 +171,7 @@ EOF
 
 1. Run `git status`, `git diff --stat`, `git log --oneline -10`.
 2. Read every diff. Decide the grouping.
-3. **Tell the user the plan** before committing: *"I'll do N commits: (1) ..., (2) ..., (N) ..."*. Do not just start. If the user pushes back, reshape.
+3. **Tell the user the plan** before committing: *"I'll do N commits: (1) ..., (2) ..., (N) ..."* (or *"I'll make one commit: ..."* if the working tree is a single concern). Announce, then proceed — do not wait for approval. If the user pushes back mid-flow, reshape.
 4. For each commit, in order:
    1. Edit mixed files to the intermediate state for this commit.
    2. `git add <file>` / `git rm <file>` for files in scope.
