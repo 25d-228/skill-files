@@ -6,7 +6,7 @@ allowed-tools: Bash Read Edit Grep Glob
 
 # Node Release Patch
 
-Cut a fresh patch release of a Node project: bump `x.y.z` → `x.y.(z+1)` in `package.json`, run the build, and produce the project's distributable artifact at the repo root.
+Cut a fresh patch release of a Node project: bump `x.y.z` → `x.y.(z+1)` in `package.json`, run the build, and produce the project's distributable artifact in the `releases/` directory at the repo root.
 
 This skill is generic — it works for plain npm packages, VS Code extensions, CLIs, libraries, or any other Node project with a `package.json`. It auto-detects the build and packaging commands from what the project declares.
 
@@ -37,15 +37,32 @@ Read `package.json`. Note:
 - The `"devDependencies"` — look for `@vscode/vsce` (VS Code extension), `electron-builder`, or other packagers that influence what the final artifact is.
 - The `"private": true` flag — if present, `npm pack` still works but the project isn't meant for npm publish. That's fine for this skill.
 
-Then check whether a prior build artifact exists at the repo root:
+Then check whether a prior build artifact exists:
 
 ```bash
+ls releases/*.vsix releases/*.tgz 2>/dev/null
 ls *.vsix *.tgz 2>/dev/null
 ```
 
-If nothing matches — no `.vsix`, no `.tgz`, no prior artifact of any kind — this is a first release. Set the target version to exactly `0.0.0` (see the first-release rule above). Skip the "bump" arithmetic entirely; you are not bumping, you are establishing the starting version. If `package.json` already has a version like `0.0.1` or `1.2.3`, overwrite it with `0.0.0` for this run — the first-release rule takes precedence over whatever arbitrary starting value the project scaffolded with.
+If nothing matches in either location — no `.vsix`, no `.tgz`, no prior artifact of any kind — this is a first release. Set the target version to exactly `0.0.0` (see the first-release rule above). Skip the "bump" arithmetic entirely; you are not bumping, you are establishing the starting version. If `package.json` already has a version like `0.0.1` or `1.2.3`, overwrite it with `0.0.0` for this run — the first-release rule takes precedence over whatever arbitrary starting value the project scaffolded with.
 
-If any prior artifact does exist, proceed with the normal bump arithmetic against the `package.json` version.
+If any prior artifact exists (in either location), proceed with the normal bump arithmetic against the `package.json` version.
+
+### 1b. Ensure `releases/` directory and relocate stale artifacts
+
+Create `releases/` if it does not already exist:
+
+```bash
+mkdir -p releases
+```
+
+If any build artifacts (`.vsix`, `.tgz`) exist at the **repo root**, move them into `releases/`:
+
+```bash
+mv *.vsix *.tgz releases/ 2>/dev/null
+```
+
+This is a one-time migration — once all artifacts live in `releases/`, this step is a no-op.
 
 ### 2. Confirm the plan
 
@@ -97,17 +114,17 @@ Detect what kind of artifact this project produces and run the matching command:
 
 - **VS Code extension** (`@vscode/vsce` in `devDependencies`, or an `engines.vscode` field in `package.json`):
   ```bash
-  npx vsce package
+  npx vsce package -o releases/
   ```
-  This writes `<name>-<version>.vsix` at the repo root.
+  This writes `<name>-<version>.vsix` into `releases/`.
 
-- **Electron app** (`electron-builder` in `devDependencies`): the project usually wires this into `npm run package` or `npm run dist`. If step 4 already produced the artifact, skip this step. Otherwise run the project's own packaging script — do not invent a new one.
+- **Electron app** (`electron-builder` in `devDependencies`): the project usually wires this into `npm run package` or `npm run dist`. If step 4 already produced the artifact, move it into `releases/`. Otherwise run the project's own packaging script and move the resulting artifact into `releases/` — do not invent a new one.
 
 - **Plain npm package / library / CLI**:
   ```bash
-  npm pack
+  npm pack --pack-destination releases/
   ```
-  This writes `<name>-<version>.tgz` at the repo root. Scoped packages (`@scope/name`) produce `scope-name-<version>.tgz`.
+  This writes `<name>-<version>.tgz` into `releases/`. Scoped packages (`@scope/name`) produce `scope-name-<version>.tgz`.
 
 - **Unknown / custom**: if the project has a `release`, `dist`, or `bundle` script in `package.json`, ask the user whether to run it. Do not run publishing commands (`npm publish`, `vsce publish`, `gh release create`) — those are separate, destructive actions.
 
@@ -121,10 +138,10 @@ Common failures:
 ### 6. Verify
 
 ```bash
-ls -la <expected-artifact-path>
+ls -la releases/<expected-artifact-filename>
 ```
 
-Confirm the file exists and its size looks reasonable. For reference:
+Confirm the file exists in `releases/` and its size looks reasonable. For reference:
 
 - VS Code extensions are usually 100 KB – 5 MB.
 - npm library tarballs are usually 10 KB – 2 MB.
@@ -140,7 +157,7 @@ Report the absolute path to the user.
 - **Does not push.** Never push to remote from this skill.
 - **Does not publish.** `npm publish`, `vsce publish`, `gh release create`, and similar are destructive actions that must be user-initiated.
 - **Does not create git tags.** Tagging is part of a real release workflow and happens after the user validates the artifact.
-- **Does not delete older artifacts.** Previous `.vsix` / `.tgz` files accumulate in the repo root; the user decides when to clean them up.
+- **Does not delete older artifacts.** Previous `.vsix` / `.tgz` files accumulate in `releases/`; the user decides when to clean them up.
 - **Does not modify anything outside `package.json`** — except side effects of the build step itself (`dist/`, `out/`, `build/`, or whatever the project writes).
 - **Does not update `CHANGELOG.md`.** If the project maintains a changelog, the user writes the entry; this skill is about producing the artifact.
 
@@ -151,4 +168,4 @@ One or two sentences. Tell the user:
 1. The old version and new version.
 2. The absolute path to the produced artifact.
 
-Example: *"Packaged `ask-markdown-0.2.2.vsix` (bumped from 0.2.1). File is at `/absolute/path/to/ask-markdown-0.2.2.vsix`."*
+Example: *"Packaged `ask-markdown-0.2.2.vsix` (bumped from 0.2.1). File is at `releases/ask-markdown-0.2.2.vsix`."*
