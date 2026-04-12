@@ -176,6 +176,18 @@ A heading `### Test method` at the end of each phase. Describe exactly how the p
 >
 > **Expected result:** All 4 tests pass. `test_duplicate_email` returns 409. `test_login_success` response body contains a `token` field.
 
+### 5. Phase completion summary
+
+End every phase with a `### What was implemented` section. This section tells the agent executing the plan to stop and report to the user what was built in this phase. The agent reading this plan is not the same agent that wrote it — it needs an explicit instruction to communicate progress.
+
+> ### What was implemented
+>
+> After completing this phase, tell the user:
+>
+> - Which files were created or changed.
+> - What the system can now do that it could not do before this phase.
+> - How to verify it works (repeat the key verify command).
+
 ## Style rules
 
 - Plain, direct language. Short sentences.
