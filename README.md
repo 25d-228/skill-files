@@ -13,7 +13,8 @@ skill-files/
 ├── commit-split/SKILL.md
 ├── development-plan/SKILL.md
 ├── leetcode-explain/SKILL.md
-└── node-release-patch/SKILL.md
+├── node-release-patch/SKILL.md
+└── readme-update/SKILL.md
 ```
 
 All agents point at the same directory — no per-agent copies.
