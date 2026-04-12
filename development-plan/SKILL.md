@@ -190,6 +190,7 @@ End every phase with a `### What was implemented` section. This section tells th
 
 ## Style rules
 
+- **No code snippets in the plan.** Describe what to build in natural language — name the function, its inputs, its behavior, and its return value, but do not write the implementation. The agent executing the plan writes the code; the plan tells it *what* to build, not *how* to type it. Shell commands the user or agent can run (install, build, test, migrate) are fine — those are actions, not implementations.
 - Plain, direct language. Short sentences.
 - Imperative voice: "Run `npm install`", not "you should run npm install".
 - Concrete over abstract: name the exact command, file, or field.
