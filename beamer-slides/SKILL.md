@@ -10,30 +10,35 @@ Apply these conventions when writing or reviewing academic Beamer decks. They co
 ## Wording
 
 - Prefer neutral, comparative wording: **higher/lower on metric X**, not vague "good/bad" or "better/worse".
+- **Give examples** — illustrate abstract concepts with concrete instances on the slide, not just definitions.
 
 ## Visual design
 
 - Add **page numbers** to every slide.
+- Do **not overuse frames** — combine closely related points onto one slide rather than splitting every bullet into its own frame.
 
 ## Figures and sources
 
+- **Illustrate the method** — when presenting a method or algorithm, include a visual diagram or worked example, not just text.
 - If a figure is copied, write exactly **Copied from …** — not vague "credits" or "sourced from".
-- For slides covering prior work, cite **title, authors, venue, year**. Avoid sloppy "et al." when a full listing is expected.
-- Keep citations **inside** sentence punctuation: `claim (Author, Year).` — not `claim. (Author, Year)`.
+- Always place a **comma after the author name(s)** and after **"et al."** in citations: `(Smith, 2020)`, `(Smith et al., 2020)` — not `(Smith 2020)` or `(Smith et al. 2020)`.
+- Distinguish **(Author, Year)** for citing a paper from **Author (Year)** for citing a person. Slides should use each form appropriately.
+- In figure/table captions, always use the paper-citing form: **Figure/Table: (Author, Year)**, not the person-citing form.
 
 ## Typography and notation
 
 - Keep **notation consistent** across the deck.
-- Avoid **unnecessary abbreviations**. Define only what you actually use.
+- **Define every abbreviation** on first use. Avoid unnecessary abbreviations altogether.
 - Distinguish **similar concepts** explicitly (e.g. analogical mean vs generalized mean).
 - Avoid random **ALL CAPS**. Let typography rules handle casing.
 - In LaTeX / Beamer, prefer **relative units** (`em`, `ex`) over absolute (`pt`, `cm`) where applicable.
-- Aim for **≤ 7 lines per slide** and **≤ 9 words per line** when feasible.
+- Aim for **≤ 7 lines per slide** and **≤ 9 words per line** when feasible. The word limit encourages concise sentences — do **not** artificially break a natural sentence across lines just to hit the target.
 - Use **clear vector notation** consistently (e.g. arrow form for vectors).
 
 ## Tables and graphs
 
 - Every graph needs **axis labels and units**.
+- **Mark comparison direction with arrows** (↑ higher is better, ↓ lower is better) so readers instantly know which way is good.
 - **Left-align** text; **right-align** comparable numbers.
 - Place **comparable rows or columns close together** in tables.
 - Prefer readable spoken forms over scientific notation when appropriate (e.g. "40 million", not `4.3e7`).
