@@ -8,6 +8,10 @@ allowed-tools: Bash Read Edit Grep Glob
 
 Turn a dirty working tree into a clean, focused commit history where each commit represents one logical change — one feature, one refactor, one fix, one packaging tweak.
 
+## Ground truth is the disk, not the conversation
+
+**Always read the current file from disk before acting on it.** Never rely on file contents seen earlier in the conversation — the user or a linter may have changed the file since then. This applies to every step: reading diffs, deciding groupings, editing files, and writing commit messages. If you need a file's content, `Read` or `git diff` it again right before you use it.
+
 ## Before splitting
 
 Ask nothing the repo can already answer. Run these first:
@@ -51,22 +55,23 @@ A single file often contains hunks from multiple logical groups — e.g. a `READ
 
 Most files belong entirely to one commit. Stage them whole with `git add <file>`. Only reach for hunk splitting when a file genuinely spans multiple commits. Check `git diff --stat` first — most working trees have fewer mixed files than you'd expect.
 
-### Strategy 2: Revert-and-reapply (preferred for complex files)
+### Strategy 2: Save-edit-restore (preferred for complex files)
 
-For files with mixed hunks across commits, edit the working tree to reflect the *intermediate state* you want for the current commit, then commit, then edit it forward for the next commit.
+For files with mixed hunks across commits, save the final state to a temp location, edit the working tree to the intermediate state you want, commit, then restore the saved copy — never re-apply from chat memory.
 
 Concrete workflow:
 
 1. The working tree currently holds all changes ("final state").
-2. Use `Edit` to revert the hunks that belong to *later* commits back to their HEAD form. The working tree now holds only commit 1's changes.
-3. `git add <file>` and commit.
-4. Use `Edit` to re-apply the hunks you reverted in step 2. The working tree now holds the state needed for commit 2.
-5. `git add <file>` and commit.
-6. Repeat for further commits.
+2. Copy each mixed file to `.git/split-tmp/`: `mkdir -p .git/split-tmp && cp <file> .git/split-tmp/`.
+3. Use `Edit` to revert the hunks that belong to *later* commits back to their HEAD form. The working tree now holds only commit 1's changes.
+4. `git add <file>` and commit.
+5. Restore the saved final state: `cp .git/split-tmp/<file> <file>`. **Do not re-apply changes from conversation history** — always restore from the saved copy.
+6. Use `Edit` to remove the hunks already committed (now in HEAD). The working tree now holds only commit 2's changes.
+7. `git add <file>` and commit.
+8. Repeat steps 5–7 for further commits.
+9. Clean up: `rm -rf .git/split-tmp`.
 
-This is more reliable than `git add -p` because `Edit` gives exact control and no interactive prompts. It also works when a single line holds changes from two different logical groups (e.g. one import line that both removes an old symbol and adds a new one) — `git add -p` cannot split that, but `Edit` can.
-
-Keep a mental note of which hunks belong to which commit before you start reverting, so you know what to re-apply.
+This is more reliable than `git add -p` because `Edit` gives exact control and no interactive prompts. It also works when a single line holds changes from two different logical groups (e.g. one import line that both removes an old symbol and adds a new one) — `git add -p` cannot split that, but `Edit` can. Restoring from the saved copy instead of re-applying from memory eliminates drift when conversation context is compacted or stale.
 
 ### Strategy 3: git add -p (when strategy 2 is heavy)
 
@@ -94,6 +99,8 @@ Avoid `git add -p` when any single hunk straddles two logical groups. Use strate
 If an intermediate state fails to compile, the split is wrong. Bundle the offending hunks together into one commit, or split differently. Do not commit broken intermediate states and "fix it in the next commit" — that defeats the point of splitting.
 
 ## Commit messages
+
+**Always base the commit message on the actual staged diff** — run `git diff --cached` and read the current file state before writing. Never summarize from conversation history or earlier readings; files may have changed since then.
 
 Match the repo's existing style. Check `git log --oneline -10` first. If the history uses conventional commits (`feat:`, `fix:`, `chore:`), follow that. If it uses sentence-case imperative titles, follow that. Do not impose a style the repo doesn't already use.
 
