@@ -16,6 +16,8 @@ Apply these conventions when writing or reviewing academic Beamer decks. They co
 
 - Add **page numbers** to every slide.
 - Do **not overuse frames** — combine closely related points onto one slide rather than splitting every bullet into its own frame.
+- When categories or concepts recur across slides, assign each a **consistent color** and carry it throughout the deck.
+- Use **progressive reveal** (`\uncover`, `\only`, `\onslide`) to build complex slides incrementally — show the simple view first, then add detail.
 
 ## Figures and sources
 
@@ -30,6 +32,7 @@ Apply these conventions when writing or reviewing academic Beamer decks. They co
 - Keep **notation consistent** across the deck.
 - **Define every abbreviation** on first use. Avoid unnecessary abbreviations altogether.
 - Distinguish **similar concepts** explicitly (e.g. analogical mean vs generalized mean).
+- Use **sentence case** for slide titles and headings — capitalize only the first word (and proper nouns), not every word.
 - Avoid random **ALL CAPS**. Let typography rules handle casing.
 - In LaTeX / Beamer, prefer **relative units** (`em`, `ex`) over absolute (`pt`, `cm`) where applicable.
 - Aim for **≤ 7 lines per slide** and **≤ 9 words per line** when feasible. The word limit encourages concise sentences — do **not** artificially break a natural sentence across lines just to hit the target.
@@ -43,6 +46,11 @@ Apply these conventions when writing or reviewing academic Beamer decks. They co
 - Place **comparable rows or columns close together** in tables.
 - Prefer readable spoken forms over scientific notation when appropriate (e.g. "40 million", not `4.3e7`).
 - Every figure should support **one takeaway sentence**. If you can't write that sentence, the figure doesn't belong.
+
+## Bibliography
+
+- Use **biblatex with biber** (`style=authoryear`) for automated citation formatting rather than manual `\bibitem` entries.
+- Set `\renewcommand*{\nameyeardelim}{\addcomma\space}` to ensure the comma between author and year.
 
 ## Datasets and publication
 
