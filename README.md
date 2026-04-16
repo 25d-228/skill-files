@@ -13,7 +13,8 @@ skill-files/
 ├── development-plan/SKILL.md
 ├── leetcode-explain/SKILL.md
 ├── node-release-patch/SKILL.md
-└── readme-update/SKILL.md
+├── readme-update/SKILL.md
+└── waseda-ips-thesis/SKILL.md
 ```
 
 All agents point at the same directory — no per-agent copies.
