@@ -84,6 +84,43 @@ Do **not** modify `package-lock.json` by hand. `npm install` does that; we don't
 
 Prefer `Edit` over `npm version patch`. The npm command creates a git tag and a commit by default, which this skill explicitly does not do (see "What this skill does NOT do"). You can use `npm version patch --no-git-tag-version` if you prefer, but a single-line edit is simpler and has no side effects.
 
+### 3b. Update `CHANGELOG.md`
+
+Record this release in `CHANGELOG.md` at the repo root. This step always runs — every invocation of the skill appends (or creates) an entry.
+
+**If `CHANGELOG.md` does not exist**, create it with:
+
+```markdown
+# Changelog
+
+## <new-version> - <YYYY-MM-DD>
+
+- <bullet entries>
+```
+
+**If it exists**, prepend a new section immediately below the top-level `# Changelog` heading. Keep all prior entries untouched:
+
+```markdown
+## <new-version> - <YYYY-MM-DD>
+
+- <bullet entries>
+```
+
+Use today's date in `YYYY-MM-DD` format.
+
+**Populating the bullets.** Derive them from `git log`. A reasonable heuristic, in order:
+
+1. If a prior release artifact exists in `releases/`, list commits since its mtime:
+   ```bash
+   git log --oneline --no-merges --since="$(stat -c %y releases/<most-recent-artifact>)"
+   ```
+2. Otherwise, if `CHANGELOG.md` already existed before this run, list commits since its last modification.
+3. Otherwise (first release), either list all commits or write a single bullet: `- Initial release`.
+
+Convert each commit subject to a terse one-line bullet (imperative mood, no trailing punctuation). Drop conventional-commit prefixes (`feat:`, `fix:`, `chore:`) if the project doesn't already use them in its changelog style. Skip merge commits and pure version-bump commits ("Bump version to x.y.z"). Include uncommitted changes as a bullet if they represent user-facing work.
+
+This is a starting point — the user can refine the wording afterward. Do not block on perfect phrasing.
+
 ### 4. Build (production)
 
 Pick the build script from `package.json` in this order of preference:
@@ -158,8 +195,7 @@ Report the absolute path to the user.
 - **Does not publish.** `npm publish`, `vsce publish`, `gh release create`, and similar are destructive actions that must be user-initiated.
 - **Does not create git tags.** Tagging is part of a real release workflow and happens after the user validates the artifact.
 - **Does not delete older artifacts.** Previous `.vsix` / `.tgz` files accumulate in `releases/`; the user decides when to clean them up.
-- **Does not modify anything outside `package.json`** — except side effects of the build step itself (`dist/`, `out/`, `build/`, or whatever the project writes).
-- **Does not update `CHANGELOG.md`.** If the project maintains a changelog, the user writes the entry; this skill is about producing the artifact.
+- **Does not modify anything outside `package.json` and `CHANGELOG.md`** — except side effects of the build step itself (`dist/`, `out/`, `build/`, or whatever the project writes).
 
 ## End-of-run summary
 
