@@ -47,42 +47,11 @@ Untracked dev docs, README updates, and inline comments ride in the commit whose
 
 If two pieces of work truly belong together — a schema change and the code that uses it, a type rename and every call site — one commit is fine. If they don't, split them.
 
-## Handling files with mixed hunks
+## Staging strategy: whole files only
 
-A single file often contains hunks from multiple logical groups — e.g. a `README.md` with a feature addition *and* a removal *and* a typo fix. You cannot always `git add <file>` cleanly. Three strategies, in order of preference:
+**Always stage whole files with `git add <file>`.** Never split hunks within a file — no `git add -p`, no editing the working tree to create intermediate states, no saving and restoring file copies. The working tree is never modified during a split.
 
-### Strategy 1: File-level where possible
-
-Most files belong entirely to one commit. Stage them whole with `git add <file>`. Only reach for hunk splitting when a file genuinely spans multiple commits. Check `git diff --stat` first — most working trees have fewer mixed files than you'd expect.
-
-### Strategy 2: Save-edit-restore (preferred for complex files)
-
-For files with mixed hunks across commits, save the final state to a temp location, edit the working tree to the intermediate state you want, commit, then restore the saved copy — never re-apply from chat memory.
-
-Concrete workflow:
-
-1. The working tree currently holds all changes ("final state").
-2. Copy each mixed file to `.git/split-tmp/`: `mkdir -p .git/split-tmp && cp <file> .git/split-tmp/`.
-3. Use `Edit` to revert the hunks that belong to *later* commits back to their HEAD form. The working tree now holds only commit 1's changes.
-4. `git add <file>` and commit.
-5. Restore the saved final state: `cp .git/split-tmp/<file> <file>`. **Do not re-apply changes from conversation history** — always restore from the saved copy.
-6. Use `Edit` to remove the hunks already committed (now in HEAD). The working tree now holds only commit 2's changes.
-7. `git add <file>` and commit.
-8. Repeat steps 5–7 for further commits.
-9. Clean up: `rm -rf .git/split-tmp`.
-
-This is more reliable than `git add -p` because `Edit` gives exact control and no interactive prompts. It also works when a single line holds changes from two different logical groups (e.g. one import line that both removes an old symbol and adds a new one) — `git add -p` cannot split that, but `Edit` can. Restoring from the saved copy instead of re-applying from memory eliminates drift when conversation context is compacted or stale.
-
-### Strategy 3: git add -p (when strategy 2 is heavy)
-
-For files with many well-separated hunks that each cleanly belong to exactly one commit, `git add -p <file>` works:
-
-- `y` — include this hunk.
-- `n` — skip this hunk.
-- `s` — split this hunk into smaller pieces if git offers.
-- `q` — quit.
-
-Avoid `git add -p` when any single hunk straddles two logical groups. Use strategy 2 instead.
+If a file contains hunks from multiple logical groups, assign the entire file to the commit whose concern dominates it. Accept that a commit may carry a few stray hunks from another concern — that impurity is a better tradeoff than the complexity and risk of manipulating the working tree mid-split.
 
 ## Smoke check between commits
 
@@ -162,11 +131,9 @@ EOF
 2. Read every diff. Decide the grouping.
 3. **Tell the user the plan** before committing: *"I'll do N commits: (1) ..., (2) ..., (N) ..."* (or *"I'll make one commit: ..."* if the working tree is a single concern). Announce, then proceed — do not wait for approval. If the user pushes back mid-flow, reshape.
 4. For each commit, in order:
-   1. Edit mixed files to the intermediate state for this commit.
-   2. `git add <file>` / `git rm <file>` for files in scope.
-   3. Run the fast smoke check.
-   4. `git commit` with a HEREDOC message.
-   5. Restore mixed files for the next commit.
+   1. `git add <file>` / `git rm <file>` for every file in this commit's group.
+   2. Run the fast smoke check.
+   3. `git commit` with a HEREDOC message.
 5. Run `git log --oneline -N` to verify the final history reads cleanly.
 6. Run `git status` to verify the working tree is clean (or holds only what you intentionally left uncommitted).
 7. **Do not `git push`** unless the user asks.
@@ -177,4 +144,4 @@ EOF
 - **Deleted files**: use `git rm <file>`, not `git add`. A deletion is a logical change like any other and belongs in the commit whose concern motivated it.
 - **Renames**: git detects renames from content similarity, so a rename appears as a delete + add in `git status` but as one rename in `git log`. Commit both sides together.
 - **Lockfile drift** (`package-lock.json`, `Cargo.lock`, `uv.lock`): bundle with the dependency change that caused it. If the lockfile is stale from an *earlier* change the user didn't commit, include it with the most closely related commit.
-- **Binary files** (images, generated assets): stage them with the commit whose concern introduced them. Never use `git add -p` on binaries — it doesn't apply.
+- **Binary files** (images, generated assets): stage them with the commit whose concern introduced them.
