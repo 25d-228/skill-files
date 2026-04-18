@@ -1,6 +1,6 @@
 ---
 name: changelog-update
-description: Create or update the project CHANGELOG so it accurately records what has changed in the repository. Use when the user asks to write a changelog, add a changelog entry, refresh a stale changelog, or document a release that has outpaced its changelog.
+description: Create or update the project CHANGELOG so it accurately records what has changed in the repository. ONLY use when the user explicitly invokes this skill by name (e.g. `/changelog-update`). Do NOT auto-trigger on phrases like "write a changelog", "update the changelog", or "document the release" — wait for an explicit invocation.
 allowed-tools: Read Edit Write Glob Grep Bash
 ---
 
