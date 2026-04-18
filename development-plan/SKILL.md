@@ -1,6 +1,6 @@
 ---
 name: development-plan
-description: Write a phased, executable development plan for a software project. Use when the user asks for a development plan, project plan, implementation plan, build plan, or roadmap. Produces markdown with concrete commands, expected results, and verification steps.
+description: Write a phased, executable development plan for a software project, producing markdown with concrete commands, expected results, and verification steps. ONLY use when the user explicitly invokes this skill by name (e.g. `/development-plan`). Do NOT auto-trigger on phrases like "write a development plan", "plan this project", or "give me a roadmap" — wait for an explicit invocation.
 argument-hint: [project-name]
 allowed-tools: Read Glob Grep Write
 ---

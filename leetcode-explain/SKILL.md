@@ -1,6 +1,6 @@
 ---
 name: leetcode-explain
-description: Explain a LeetCode problem from a leetcode.com or leetcode.cn URL. Use whenever the user pastes a LeetCode link and asks for an explanation, walkthrough, or solution — even a bare "explain this" alongside the URL counts.
+description: Explain a LeetCode problem from a leetcode.com or leetcode.cn URL, producing a structured explanation with a worked example and runnable code. ONLY use when the user explicitly invokes this skill by name (e.g. `/leetcode-explain`). Do NOT auto-trigger on phrases like "explain this leetcode problem", "walk me through this", or a bare LeetCode URL — wait for an explicit invocation.
 argument-hint: [leetcode-url]
 allowed-tools: WebFetch
 ---

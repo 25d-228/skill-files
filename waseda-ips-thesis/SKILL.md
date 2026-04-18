@@ -1,6 +1,6 @@
 ---
 name: waseda-ips-thesis
-description: Conventions and required structure for a Waseda IPS (Graduate School of Information, Production and Systems) master's thesis written with the EBMT/NLP lab LaTeX template (styles/ebmtnlplab, styles/analogy, styles/jupyter). Use when drafting, editing, or compiling a thesis that uses these styles, or when adding/removing chapters or appendices in such a thesis.
+description: Conventions and required structure for a Waseda IPS (Graduate School of Information, Production and Systems) master's thesis written with the EBMT/NLP lab LaTeX template (styles/ebmtnlplab, styles/analogy, styles/jupyter). ONLY use when the user explicitly invokes this skill by name (e.g. `/waseda-ips-thesis`). Do NOT auto-trigger on phrases like "edit this thesis", "compile the thesis", or "add a chapter" — wait for an explicit invocation.
 ---
 
 # Waseda IPS Master's Thesis (EBMT/NLP lab template)
