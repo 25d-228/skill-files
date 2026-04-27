@@ -1,10 +1,6 @@
----
-name: readme-update
-description: Create or update the project README so it accurately reflects the current state of the repository. ONLY use when the user explicitly invokes this skill by name (e.g. `/readme-update`). Do NOT auto-trigger on phrases like "write a README", "update the README", or "the README is stale" — wait for an explicit invocation.
-allowed-tools: Read Edit Write Glob Grep Bash
----
-
 # README Update
+
+> **Invocation:** Use only when explicitly invoked (e.g. `/readme-update`). Do not auto-trigger on phrases like "write a README", "update the README", or "the README is stale".
 
 Create or update the project's root README (`README.md`, `README.rst`, `README`, or similar) so it accurately describes what the repository contains right now.
 

@@ -1,9 +1,6 @@
----
-name: karpathy-principles
-description: Four behavioral guidelines for reducing common LLM coding mistakes — Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution — derived from Andrej Karpathy's critique. Apply these as a coding posture for the rest of the session. ONLY use when the user explicitly invokes this skill by name (e.g. `/karpathy-principles`). Do NOT auto-trigger on phrases like "be careful", "keep it simple", or "don't over-engineer" — wait for an explicit invocation.
----
-
 # Karpathy Principles
+
+> **Invocation:** Use only when explicitly invoked (e.g. `/karpathy-principles`). Do not auto-trigger on phrases like "be careful", "keep it simple", or "don't over-engineer".
 
 Behavioral guidelines for coding work, distilled from Andrej Karpathy's critique of common LLM coding failure modes (https://github.com/forrestchang/andrej-karpathy-skills). Apply these as a posture for the rest of the session, on top of any project-specific instructions.
 

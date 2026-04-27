@@ -1,9 +1,6 @@
----
-name: beamer-slides
-description: Academic slide conventions for wording, figures, notation, tables, and integrity for Beamer (or other LaTeX-based) academic slide decks — especially research talks and course lectures. ONLY use when the user explicitly invokes this skill by name (e.g. `/beamer-slides`). Do NOT auto-trigger on phrases like "review these slides", "draft some beamer slides", or "help with the slide deck" — wait for an explicit invocation.
----
-
 # Beamer Slides
+
+> **Invocation:** Use only when explicitly invoked (e.g. `/beamer-slides`). Do not auto-trigger on phrases like "review these slides", "draft some beamer slides", or "help with the slide deck".
 
 Apply these conventions when writing or reviewing academic Beamer decks. They cover neutral phrasing, layout, figures, notation, tables, and honest reporting of datasets and publication status.
 

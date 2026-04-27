@@ -1,10 +1,6 @@
----
-name: node-release-patch
-description: Bump the patch version of a Node project, build it, and produce a distributable artifact (npm tarball, VS Code VSIX, etc.). ONLY use when the user explicitly invokes this skill by name (e.g. `/node-release-patch`). Do NOT auto-trigger on phrases like "release", "cut a build", or "package it" — wait for an explicit invocation.
-allowed-tools: Bash Read Edit Grep Glob
----
-
 # Node Release Patch
+
+> **Invocation:** Use only when explicitly invoked (e.g. `/node-release-patch`). Do not auto-trigger on phrases like "release", "cut a build", or "package it".
 
 Cut a fresh patch release of a Node project: bump `x.y.z` → `x.y.(z+1)` in `package.json`, run the build, and produce the project's distributable artifact in the `releases/` directory at the repo root.
 

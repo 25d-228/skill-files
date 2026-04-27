@@ -1,10 +1,6 @@
----
-name: commit-split
-description: Split a working tree full of mixed uncommitted changes into a small number of focused, reviewable commits. ONLY use when the user explicitly invokes this skill by name (e.g. `/commit-split`). Do NOT auto-trigger on phrases like "commit these separately", "break this into commits", or "group these logically" — wait for an explicit invocation.
-allowed-tools: Bash Read Edit Grep Glob
----
-
 # Commit Split
+
+> **Invocation:** Use only when explicitly invoked (e.g. `/commit-split`). Do not auto-trigger on phrases like "commit these separately", "break this into commits", or "group these logically".
 
 Turn a dirty working tree into a clean, focused commit history where each commit represents one logical change — one feature, one refactor, one fix, one packaging tweak.
 

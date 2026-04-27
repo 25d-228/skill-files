@@ -1,9 +1,6 @@
----
-name: waseda-ips-thesis
-description: Maintenance edits (add, update, delete content) on an existing Waseda IPS (Graduate School of Information, Production and Systems) master's thesis built on a LaTeX template that loads `styles/ebmtnlplab`, `styles/analogy`, and `styles/jupyter`. Not a setup guide. ONLY use when the user explicitly invokes this skill by name (e.g. `/waseda-ips-thesis`). Do NOT auto-trigger on phrases like "edit this thesis", "compile the thesis", or "add a chapter" — wait for an explicit invocation.
----
-
 # Waseda IPS Master's Thesis — maintenance edits
+
+> **Invocation:** Use only when explicitly invoked (e.g. `/waseda-ips-thesis`). Do not auto-trigger on phrases like "edit this thesis", "compile the thesis", or "add a chapter". Maintenance only — not a setup guide.
 
 Updates to an existing thesis that loads `styles/ebmtnlplab`, `styles/analogy`, and `styles/jupyter`. Scaffolding (preamble, title-page macros, skeleton, required appendices, bibliography setup) is treated as **read-only** unless the user explicitly asks to change it.
 

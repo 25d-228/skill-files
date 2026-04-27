@@ -1,10 +1,6 @@
----
-name: changelog-update
-description: Create or update the project CHANGELOG so it accurately records what has changed in the repository. ONLY use when the user explicitly invokes this skill by name (e.g. `/changelog-update`). Do NOT auto-trigger on phrases like "write a changelog", "update the changelog", or "document the release" — wait for an explicit invocation.
-allowed-tools: Read Edit Write Glob Grep Bash
----
-
 # Changelog Update
+
+> **Invocation:** Use only when explicitly invoked (e.g. `/changelog-update`). Do not auto-trigger on phrases like "write a changelog", "update the changelog", or "document the release".
 
 Create or update the project's root changelog (`CHANGELOG.md`, `CHANGES.md`, `HISTORY.md`, or similar) so it accurately records what has changed in the repository since the last entry.
 
