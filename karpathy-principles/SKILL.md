@@ -1,8 +1,6 @@
 # Karpathy Principles
 
-> **Invocation:** Use only when explicitly invoked (e.g. `/karpathy-principles`). Do not auto-trigger on phrases like "be careful", "keep it simple", or "don't over-engineer".
-
-Behavioral guidelines for coding work, distilled from Andrej Karpathy's critique of common LLM coding failure modes (https://github.com/forrestchang/andrej-karpathy-skills). Apply these as a posture for the rest of the session, on top of any project-specific instructions.
+Behavioral guidelines for coding work, distilled from Andrej Karpathy's critique of common LLM coding failure modes. Apply these as a posture for the rest of the session, on top of any project-specific instructions.
 
 **Tradeoff:** these guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
