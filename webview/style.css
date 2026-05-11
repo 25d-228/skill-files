@@ -1,0 +1,328 @@
+:root {
+  /* Solarized palette (Ethan Schoonover) */
+  --base03:  #002b36;
+  --base02:  #073642;
+  --base01:  #586e75;
+  --base00:  #657b83;
+  --base0:   #839496;
+  --base1:   #93a1a1;
+  --base2:   #eee8d5;
+  --base3:   #fdf6e3;
+  --yellow:  #b58900;
+  --orange:  #cb4b16;
+  --red:     #dc322f;
+  --magenta: #d33682;
+  --violet:  #6c71c4;
+  --blue:    #268bd2;
+  --cyan:    #2aa198;
+  --green:   #859900;
+
+  /* Light theme (default) — Solarized Light */
+  --bg:        var(--base3);
+  --bg-elev:   #fbf3da;
+  --bg-row:    #f6efd4;
+  --bg-hover:  var(--base2);
+  --fg:        var(--base01);
+  --fg-soft:   var(--base00);
+  --fg-muted:  var(--base1);
+  --border:    #ddd5b8;
+  --accent:    var(--blue);
+  --header-bg: var(--base02);
+  --header-fg: var(--base3);
+  --code-bg:   rgba(101, 123, 131, 0.12);
+  --tag-fg:    var(--base3);
+  --tag-muted-bg: var(--base01);
+  --diff-add-bg:    rgba(133, 153, 0, 0.18);
+  --diff-remove-bg: rgba(220, 50, 47, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        var(--base03);
+    --bg-elev:   var(--base02);
+    --bg-row:    #04303d;
+    --bg-hover:  #0d4a5b;
+    --fg:        var(--base1);
+    --fg-soft:   var(--base0);
+    --fg-muted:  var(--base01);
+    --border:    #0a3a48;
+    --accent:    var(--blue);
+    --header-bg: #001f27;
+    --header-fg: var(--base2);
+    --code-bg:   rgba(147, 161, 161, 0.12);
+    --tag-muted-bg: var(--base0);
+    --diff-add-bg:    rgba(133, 153, 0, 0.22);
+    --diff-remove-bg: rgba(220, 50, 47, 0.25);
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  max-width: 1300px;
+  margin: 1.5rem auto;
+  padding: 0 1rem 3rem;
+  line-height: 1.55;
+}
+
+/* ============ Headings & lead text ============ */
+
+h1 {
+  font-size: 1.6rem;
+  margin: 0 0 0.25rem 0;
+  color: var(--fg);
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin: 2rem 0 0.5rem 0;
+  border-left: 4px solid var(--accent);
+  padding-left: 0.6rem;
+  color: var(--fg);
+}
+
+h2 .h2-sub {
+  font-weight: normal;
+  color: var(--fg-muted);
+  font-size: 0.88rem;
+}
+
+.subtitle { color: var(--fg-soft); margin: 0 0 0.5rem 0; }
+.date     { color: var(--fg-muted); font-size: 0.85rem; margin: 0 0 1.5rem 0; }
+.intro    { color: var(--fg-soft); margin: 0.5rem 0 1rem 0; }
+
+/* ============ Tables ============ */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-elev);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  font-size: 0.92rem;
+}
+th, td {
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+}
+thead th {
+  background: var(--header-bg);
+  color: var(--header-fg);
+  font-weight: 600;
+  font-size: 0.92rem;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+tbody tr:nth-child(even) { background: var(--bg-row); }
+tbody tr:hover { background: var(--bg-hover); }
+tbody td:first-child { font-weight: 600; color: var(--fg); }
+
+/* ============ Inline code ============ */
+
+code {
+  background: var(--code-bg);
+  color: var(--cyan);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.88em;
+  font-family: "Fira Code", Menlo, Consolas, monospace;
+}
+
+/* ============ Tag pills ============ */
+
+.tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 3px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--tag-fg);
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.tag-blue    { background: var(--blue); }
+.tag-violet  { background: var(--violet); }
+.tag-magenta { background: var(--magenta); }
+.tag-green   { background: var(--green); }
+.tag-orange  { background: var(--orange); }
+.tag-cyan    { background: var(--cyan); }
+.tag-yellow  { background: var(--yellow); }
+.tag-red     { background: var(--red); }
+.tag-muted   { background: var(--tag-muted-bg); }
+
+/* ============ Status badges (pill-shaped, neutral) ============ */
+
+.badge {
+  display: inline-block;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: var(--bg-elev);
+  color: var(--fg-muted);
+  border: 1px solid var(--border);
+}
+
+/* ============ Callouts ============ */
+
+.callout {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  color: var(--fg);
+}
+.callout-title {
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  color: var(--fg);
+}
+.callout-info    { border-left-color: var(--blue); }
+.callout-tip     { border-left-color: var(--green); }
+.callout-warning { border-left-color: var(--yellow); }
+.callout-danger  { border-left-color: var(--red); }
+
+/* ============ Comparison grid (cards) ============ */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin: 1rem 0;
+}
+.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.card-title {
+  font-weight: 700;
+  color: var(--fg);
+  font-size: 0.98rem;
+  margin-bottom: 0.4rem;
+}
+.card-meta {
+  color: var(--fg-muted);
+  font-size: 0.82rem;
+  margin-bottom: 0.4rem;
+}
+
+/* ============ Timeline ============ */
+
+.timeline {
+  list-style: none;
+  padding: 0 0 0 0.5rem;
+  margin: 1rem 0;
+  border-left: 2px solid var(--border);
+}
+.timeline > li {
+  position: relative;
+  padding: 0.1rem 0 0.85rem 1rem;
+}
+.timeline > li::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 0.5rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+}
+.timeline-date {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--fg-muted);
+  font-size: 0.85rem;
+  margin-right: 0.5rem;
+}
+
+/* ============ Mermaid diagram wrapper ============ */
+
+.mermaid {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* ============ Side-by-side code diff ============ */
+
+.diff {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.diff pre {
+  margin: 0;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.65rem 0.85rem;
+  font-family: "Fira Code", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+.diff-before { border-left: 3px solid var(--red); }
+.diff-after  { border-left: 3px solid var(--green); }
+.diff-add    { background: var(--diff-add-bg); display: block; }
+.diff-remove { background: var(--diff-remove-bg); display: block; }
+
+/* ============ Legend ============ */
+
+.legend {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+.legend strong { color: var(--fg-muted); font-weight: 600; margin-right: 0.5rem; }
+
+/* ============ Takeaways block ============ */
+
+.takeaways {
+  margin-top: 2rem;
+  padding: 1.1rem 1.3rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+}
+.takeaways h2 { border: none; padding: 0; margin-top: 0; }
+.takeaways ol { margin: 0.5rem 0 0 0; padding-left: 1.25rem; }
+.takeaways li { margin-bottom: 0.5rem; }
+.takeaways strong { color: var(--fg); }
+
+/* ============ Sources block ============ */
+
+.sources {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  color: var(--fg-muted);
+}
+.sources a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.sources a:hover { text-decoration: underline; }
+.sources ul {
+  columns: 2;
+  column-gap: 2rem;
+  padding-left: 1rem;
+}
