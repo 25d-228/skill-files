@@ -1,6 +1,6 @@
 # LeetCode Link Explanations
 
-> **Invocation:** Use only when explicitly invoked (e.g. `/leetcode-explain [leetcode-url]`). Do not auto-trigger on phrases like "explain this leetcode problem", "walk me through this", or a bare LeetCode URL.
+> **Invocation:** Per-prompt skill. Use only when explicitly invoked (e.g. `/leetcode-explain [leetcode-url]`) in the current prompt. Do not auto-trigger on phrases like "explain this leetcode problem", "walk me through this", or a bare LeetCode URL. Invocation does NOT carry over — each prompt with a new LeetCode URL must re-invoke the skill; otherwise treat the URL as plain context.
 
 Fetch a LeetCode problem page and produce a structured explanation with a worked example and runnable code.
 

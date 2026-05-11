@@ -1,6 +1,6 @@
 # Webview
 
-> **Invocation:** Use only when explicitly invoked (e.g. `/webview`). Do not auto-trigger on phrases like "show me a table", "make a diagram", or "render this nicely".
+> **Invocation:** Per-prompt skill. Use only when explicitly invoked (e.g. `/webview`) in the current prompt. Do not auto-trigger on phrases like "show me a table", "make a diagram", or "render this nicely". Invocation does NOT carry over — each prompt that wants a webview must re-invoke the skill; otherwise reply in plain chat.
 
 Render an answer, table, diagram, comparison, or any structured result as a styled HTML page in Solarized and serve it on localhost so the user can view it in their editor's built-in browser (Cursor / VS Code Simple Browser). Use this whenever the content reads better visually than as markdown chat — tables, callouts, comparison cards, timelines, diagrams, side-by-side diffs.
 

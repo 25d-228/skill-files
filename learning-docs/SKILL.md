@@ -1,6 +1,6 @@
 # Learning Docs
 
-> **Invocation:** Use only when explicitly invoked (e.g. `/learning-docs`). Do not auto-trigger on phrases like "explain this code", "write documentation", or "annotate this file".
+> **Invocation:** Per-session skill. Use only when explicitly invoked (e.g. `/learning-docs`). Do not auto-trigger on phrases like "explain this code", "write documentation", or "annotate this file". Once invoked in a session, keep applying this workflow to all subsequent learning-doc requests in the same session without re-invocation.
 
 Build a folder of click-to-toggle annotated HTML pages for a project's source files. Language-agnostic — works for Python, C, Rust, JS, Go, Java, anything. Each source file gets a sibling `.html` mirroring its filesystem path, rendered in Solarized Light + FiraCode Nerd Font with Material elevation, click-toggle tooltips on every meaningful token, and Pattern A explanations.
 
@@ -65,6 +65,17 @@ When the user invokes the skill on a repo that already has source files (instead
 6. **Update `index.html`** after each file (`todo` → `done`) so the user can refresh and watch progress.
 
 For very small repos (≤5 files), skip batching — the standard per-step workflow is fast enough.
+
+## Doc-first mode (new code)
+
+When the user is **building** the project rather than learning an existing one — they want docs for a code file or snippet that hasn't been written to disk yet — invert the order: render the doc first as a preview, then write the source only after approval.
+
+1. **Draft + write the `.html` first.** Compose the annotated HTML for the proposed code (same `page-template.html`, same Pattern A tooltips, same color classes), then `Write` it to `docs/learning/<path>.<ext>.html` and add the row to `index.html` as `done`. The rendered page is now live — the user can read it in Simple Browser as a preview of what the source file will be.
+2. **Paste the proposed source** in chat as a fenced code block, exactly as it would appear on disk. The user compares the rendered page (in browser) against the proposed source (in chat).
+3. **Ask for permission to write the source file.** End with a clear yes/no question, e.g. *"Write `src/foo.rs` now?"*. Until the user approves, do NOT touch any source file.
+4. **On approval**, `Write` the source file at the real path. On rejection or revision requests, update both the `.html` and the proposed snippet in chat, then re-ask — never write a source file the user has not approved.
+
+The doc functions as a spec/preview the user reviews before authorizing the code write. This is the only mode in which this skill writes source files.
 
 ## Page template
 
@@ -152,7 +163,7 @@ In practice: write each file's tooltips as if you've never explained anything be
 
 ## What this skill does NOT do
 
-- **Does not edit source code.** Only writes/updates `.html` files under `docs/learning/`. Source files are read-only from this skill's perspective.
+- **Does not edit source code without explicit approval.** Source files are read-only by default — only `.html` files under `docs/learning/` are written. The single exception is **doc-first mode** (above): the user reviews the rendered preview, then explicitly approves writing a brand-new source file. Existing source files are never modified.
 - **Does not commit.** `docs/learning/` is gitignored by convention; nothing here is meant for the repo's history.
 - **Does not auto-track new source files.** When a new source file lands, this skill writes its `.html` only when asked.
 

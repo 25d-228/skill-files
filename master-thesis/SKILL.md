@@ -1,6 +1,6 @@
 # Master's Thesis — maintenance edits
 
-> **Invocation:** Use only when explicitly invoked (e.g. `/master-thesis`). Do not auto-trigger on phrases like "edit this thesis", "compile the thesis", or "add a chapter". Maintenance only — not a setup guide.
+> **Invocation:** Per-session skill. Use only when explicitly invoked (e.g. `/master-thesis`). Do not auto-trigger on phrases like "edit this thesis", "compile the thesis", or "add a chapter". Maintenance only — not a setup guide. Once invoked in a session, keep applying these edit-posture rules to all subsequent thesis edits in the same session without re-invocation.
 
 Updates to an existing thesis that loads `styles/ebmtnlplab`, `styles/analogy`, and `styles/jupyter`. Scaffolding (preamble, title-page macros, skeleton, required appendices, bibliography setup) is treated as **read-only** unless the user explicitly asks to change it.
 

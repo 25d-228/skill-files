@@ -1,6 +1,6 @@
 # Beamer Slides
 
-> **Invocation:** Use only when explicitly invoked (e.g. `/beamer-slides`). Do not auto-trigger on phrases like "review these slides", "draft some beamer slides", or "help with the slide deck".
+> **Invocation:** Per-session skill. Use only when explicitly invoked (e.g. `/beamer-slides`). Do not auto-trigger on phrases like "review these slides", "draft some beamer slides", or "help with the slide deck". Once invoked in a session, keep applying these conventions to all subsequent slide-related work in the same session without re-invocation.
 
 Apply these conventions when writing or reviewing academic Beamer decks. They cover neutral phrasing, layout, figures, notation, tables, and honest reporting of datasets and publication status.
 
