@@ -233,7 +233,7 @@ h1 {
 
 .tip {
   position: absolute;
-  bottom: calc(100% + 10px);
+  top: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%);
   background: var(--surface);
@@ -260,12 +260,12 @@ h1 {
 .tok::before {
   content: "";
   position: absolute;
-  bottom: calc(100% + 5px);
+  top: calc(100% + 5px);
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
-  border-top-color: var(--surface);
-  filter: drop-shadow(0 1px 0 var(--border));
+  border-bottom-color: var(--surface);
+  filter: drop-shadow(0 -1px 0 var(--border));
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease;
@@ -279,6 +279,58 @@ h1 {
 .tok.tip-right::before { left: auto; right: 12px; transform: none; }
 .tok.tip-left .tip { left: 0; transform: none; }
 .tok.tip-left::before { left: 12px; transform: none; }
+
+/* Tooltip pagination — tabs + pages */
+.tip-tabs {
+  display: flex;
+  gap: 4px;
+  margin: -0.625rem -0.875rem 0.6rem -0.875rem;
+  padding: 0.4rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+}
+.tip-tab {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.tip-tab:hover { background: rgba(38, 139, 210, 0.08); }
+.tip-tab.active {
+  color: var(--accent);
+  background: rgba(38, 139, 210, 0.12);
+}
+.tip-page { display: none; }
+.tip-page.active { display: block; }
+.tip pre {
+  margin: 0;
+  background: var(--surface-2);
+  padding: 0.55rem 0.75rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-variant-ligatures: contextual;
+  font-feature-settings: "calt" 1;
+  font-size: 0.82rem;
+  color: var(--emph);
+  line-height: 1.65;
+  white-space: pre;
+}
+.tip pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  font-family: inherit;
+  border-radius: 0;
+}
 
 .tip code {
   font-family: var(--font-mono);

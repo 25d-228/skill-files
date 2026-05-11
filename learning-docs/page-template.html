@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{TITLE} — {PROJECT_NAME}</title>
+<link rel="stylesheet" href="{PREFIX}styles.css">
+<script src="{PREFIX}script.js" defer></script>
+</head>
+<body>
+
+<header class="app-bar">
+  <a href="{PREFIX}index.html" class="back-btn" aria-label="Back to home">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </a>
+  <a class="app-bar-title" href="{PREFIX}index.html">{TITLE}</a>
+</header>
+
+<main class="page">
+
+<div class="sub">Click the dotted tokens to see the explanation.</div>
+
+<div class="pre-summary">
+  <strong>What is this file for?</strong><br>
+  ... one short paragraph: purpose + closest analog in the user's known languages ...
+</div>
+
+<div class="code"><!-- source code with .tok / .tip annotations --></div>
+
+</main>
+</body>
+</html>
