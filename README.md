@@ -11,7 +11,8 @@ skill-files/
 ├── beamer-slides/SKILL.md
 ├── learning-docs/SKILL.md
 ├── leetcode-explain/SKILL.md
-└── master-thesis/SKILL.md
+├── master-thesis/SKILL.md
+└── webview/SKILL.md
 ```
 
 All agents point at the same directory — no per-agent copies.
