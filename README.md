@@ -10,8 +10,7 @@ Each skill is a directory at the repo root with a `SKILL.md`:
 skill-files/
 ├── beamer-slides/SKILL.md
 ├── leetcode-explain/SKILL.md
-├── node-release-patch/SKILL.md
-└── waseda-ips-thesis/SKILL.md
+└── master-thesis/SKILL.md
 ```
 
 All agents point at the same directory — no per-agent copies.

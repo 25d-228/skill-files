@@ -1,0 +1,400 @@
+/* ============================================
+   learning-docs — shared styles
+   Material Design within Solarized Light
+   ============================================ */
+
+:root {
+  --base03:  #002b36;
+  --base02:  #073642;
+  --base01:  #586e75;
+  --base00:  #657b83;
+  --base0:   #839496;
+  --base1:   #93a1a1;
+  --base2:   #eee8d5;
+  --base3:   #fdf6e3;
+  --yellow:  #b58900;
+  --orange:  #cb4b16;
+  --red:     #dc322f;
+  --magenta: #d33682;
+  --violet:  #6c71c4;
+  --blue:    #268bd2;
+  --cyan:    #2aa198;
+  --green:   #859900;
+
+  --bg:        var(--base3);
+  --surface:   var(--base3);
+  --surface-2: var(--base2);
+  --fg:        var(--base00);
+  --emph:      var(--base01);
+  --muted:     var(--base1);
+  --border:    #d8d2bc;
+  --accent:    var(--blue);
+
+  --kw:    var(--green);
+  --type:  var(--yellow);
+  --fn:    var(--blue);
+  --str:   var(--cyan);
+  --ident: var(--blue);
+  --punc:  var(--base1);
+
+  --elev-1: 0 1px 3px rgba(101, 123, 131, 0.10), 0 1px 2px rgba(101, 123, 131, 0.06);
+  --elev-2: 0 2px 6px rgba(101, 123, 131, 0.12), 0 1px 3px rgba(101, 123, 131, 0.08);
+  --elev-3: 0 4px 12px rgba(101, 123, 131, 0.14), 0 2px 4px rgba(101, 123, 131, 0.08);
+  --elev-4: 0 8px 24px rgba(101, 123, 131, 0.16), 0 4px 8px rgba(101, 123, 131, 0.08);
+
+  --font-mono: "FiraCode Nerd Font", "FiraCode NF", "Fira Code", "Cascadia Code", Consolas, monospace;
+  --font-sans: Roboto, -apple-system, "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ============================================
+   App bar
+   ============================================ */
+
+.app-bar {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 16px 0 8px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--elev-1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-bar-title {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--emph);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a.app-bar-title { cursor: pointer; }
+a.app-bar-title:hover { color: var(--accent); }
+a.app-bar-title:focus-visible {
+  outline: none;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--emph);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  margin-right: 8px;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
+  flex-shrink: 0;
+}
+.back-btn:hover { background-color: rgba(38, 139, 210, 0.08); }
+.back-btn:active { background-color: rgba(38, 139, 210, 0.16); }
+.back-btn:focus-visible {
+  outline: none;
+  background-color: rgba(38, 139, 210, 0.12);
+  box-shadow: 0 0 0 3px rgba(38, 139, 210, 0.22);
+}
+.back-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* ============================================
+   Page content
+   ============================================ */
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 4rem;
+}
+
+h1 {
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem 0;
+  color: var(--emph);
+  letter-spacing: 0.01em;
+}
+
+.sub {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+}
+
+/* ============================================
+   Cards (intro / pre-summary)
+   ============================================ */
+
+.intro, .pre-summary {
+  background: var(--surface-2);
+  padding: 1rem 1.25rem;
+  margin: 0 0 1.5rem 0;
+  border-radius: 8px;
+  border-left: 4px solid var(--accent);
+  box-shadow: var(--elev-1);
+  font-size: 0.95rem;
+  color: var(--emph);
+}
+
+.intro code, .pre-summary code {
+  background: var(--surface);
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-variant-ligatures: contextual;
+  font-feature-settings: "calt" 1;
+  font-size: 0.92em;
+  color: var(--emph);
+}
+
+.intro code.kw,    .pre-summary code.kw    { color: var(--kw); }
+.intro code.type,  .pre-summary code.type  { color: var(--type); }
+.intro code.fn,    .pre-summary code.fn    { color: var(--fn); }
+.intro code.str,   .pre-summary code.str   { color: var(--str); }
+.intro code.ident, .pre-summary code.ident { color: var(--ident); }
+.intro code.punc,  .pre-summary code.punc  { color: var(--punc); }
+.intro code .kw,   .pre-summary code .kw    { color: var(--kw); }
+.intro code .type, .pre-summary code .type  { color: var(--type); }
+.intro code .fn,   .pre-summary code .fn    { color: var(--fn); }
+.intro code .str,  .pre-summary code .str   { color: var(--str); }
+.intro code .ident,.pre-summary code .ident { color: var(--ident); }
+.intro code .punc, .pre-summary code .punc  { color: var(--punc); }
+
+/* ============================================
+   Code block
+   ============================================ */
+
+.code {
+  background: var(--surface-2);
+  padding: 1.25rem 1.5rem;
+  font-family: var(--font-mono);
+  font-variant-ligatures: contextual;
+  font-feature-settings: "calt" 1;
+  font-size: 0.95rem;
+  white-space: pre;
+  overflow-x: visible;
+  color: var(--emph);
+  border-radius: 8px;
+  box-shadow: var(--elev-2);
+  line-height: 1.7;
+}
+
+.kw      { color: var(--kw); }
+.type    { color: var(--type); }
+.fn      { color: var(--fn); }
+.str     { color: var(--str); }
+.ident   { color: var(--ident); }
+.punc    { color: var(--punc); }
+.comment { color: var(--muted); font-style: italic; }
+.attr    { color: var(--fn); }
+
+/* ============================================
+   Click-toggle tokens + tooltips
+   ============================================ */
+
+.tok {
+  position: relative;
+  border-bottom: 1px dotted var(--base1);
+  cursor: pointer;
+}
+.tok:hover, .tok:focus-visible, .tok.active { border-bottom-color: var(--accent); }
+
+.tip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  color: var(--emph);
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: normal;
+  width: max-content;
+  max-width: 380px;
+  box-shadow: var(--elev-4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 50;
+  text-align: left;
+  cursor: auto;
+}
+
+.tok::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--surface);
+  filter: drop-shadow(0 1px 0 var(--border));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 50;
+}
+
+.tok.active .tip { opacity: 1; pointer-events: auto; }
+.tok.active::before { opacity: 1; }
+
+.tok.tip-right .tip { left: auto; right: 0; transform: none; }
+.tok.tip-right::before { left: auto; right: 12px; transform: none; }
+.tok.tip-left .tip { left: 0; transform: none; }
+.tok.tip-left::before { left: 12px; transform: none; }
+
+.tip code {
+  font-family: var(--font-mono);
+  font-variant-ligatures: contextual;
+  font-feature-settings: "calt" 1;
+  font-size: 0.92em;
+  padding: 0.02em 0.28em;
+  background: var(--surface-2);
+  border-radius: 3px;
+  color: var(--emph);
+}
+.tip code.kw    { color: var(--kw); }
+.tip code.type  { color: var(--type); }
+.tip code.fn    { color: var(--fn); }
+.tip code.str   { color: var(--str); }
+.tip code.ident { color: var(--ident); }
+.tip code.punc  { color: var(--punc); }
+.tip code .kw    { color: var(--kw); }
+.tip code .type  { color: var(--type); }
+.tip code .fn    { color: var(--fn); }
+.tip code .str   { color: var(--str); }
+.tip code .ident { color: var(--ident); }
+.tip code .punc  { color: var(--punc); }
+
+/* ============================================
+   Index — file tree as Material list
+   ============================================ */
+
+.tree {
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: var(--elev-2);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+}
+
+.tree ul { list-style: none; padding: 0; margin: 0; }
+
+.tree li ul {
+  padding-left: 0.75rem;
+  margin-left: 0.875rem;
+  border-left: 1px solid var(--border);
+}
+
+.folder-row, .file-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 40px;
+  padding: 0 0.75rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.folder-row {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.file-row {
+  color: var(--emph);
+}
+
+.file-row:hover {
+  background-color: rgba(38, 139, 210, 0.08);
+}
+
+.file-row.todo {
+  color: var(--muted);
+  pointer-events: none;
+  cursor: default;
+}
+
+.tree .icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.folder-row .icon { color: var(--accent); }
+
+.tree .icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 0.6rem;
+  border-radius: 11px;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-left: auto;
+  background: rgba(147, 161, 161, 0.18);
+  color: var(--muted);
+}
+
+.chip.done {
+  background: rgba(133, 153, 0, 0.16);
+  color: var(--green);
+}
+
+.legend {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
