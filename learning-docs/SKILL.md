@@ -47,21 +47,46 @@ Each documented source file becomes an `.mdx` under `src/pages/`, mirroring the 
 
 ## Initial setup
 
-On the first invocation in a project where `docs/learning/` doesn't exist yet, do these steps before anything else:
+On the first invocation in a project where `docs/learning/` doesn't exist yet, the agent does these steps end-to-end — no user intervention until the URL is ready:
 
 1. **Copy** the skill's `template/` directory wholesale to `docs/learning/`. Read each file under `template/` and write it unchanged to the matching path under `docs/learning/`.
-2. **Add** `/docs/learning/` to the project's `.gitignore`. If `.gitignore` doesn't exist, create it with that single line.
-3. **Tell the user** to run, from `docs/learning/`:
-   ```
-   nvm install
-   nvm use
-   npm install
-   npm run dev
-   ```
-   `nvm install` reads `.nvmrc` (latest Node LTS) and installs that version. `npm run dev` starts Astro at `http://localhost:4321/`. The user opens that URL in their browser; pages refresh on file save.
-4. **Set the project name** in `src/pages/index.astro` (replace the `project="learning-docs"` prop on `<IndexLayout>` with the real project name).
 
-After setup, every subsequent invocation just runs the normal per-file workflow.
+2. **Add** `/docs/learning/` to the project's `.gitignore`. If `.gitignore` doesn't exist, create it with that single line.
+
+3. **Install `nvm` if missing.** Probe with `[ -s "$HOME/.nvm/nvm.sh" ]`. If it isn't there, run the canonical installer:
+   ```bash
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+   ```
+   The installer writes to `~/.bashrc` / `~/.zshrc` but not to fish — that's fine; the agent sources `nvm.sh` directly via bash for every nvm call, so the user's interactive shell is unaffected.
+
+4. **Install Node and project dependencies.** `nvm` is a shell function, not a binary, so every invocation must source `nvm.sh` first:
+   ```bash
+   cd docs/learning && \
+     export NVM_DIR="$HOME/.nvm" && \
+     . "$NVM_DIR/nvm.sh" && \
+     nvm install && \
+     nvm use && \
+     npm install
+   ```
+   `nvm install` reads `.nvmrc` (Node 24) and installs that version.
+
+5. **Set the project name** in `src/pages/index.astro` — replace the `project="learning-docs"` prop on `<IndexLayout>` with the real project name. Do this before starting the dev server so the first render is correct.
+
+6. **Start the dev server in the background.** Use the `Bash` tool's `run_in_background: true`:
+   ```bash
+   cd docs/learning && \
+     export NVM_DIR="$HOME/.nvm" && \
+     . "$NVM_DIR/nvm.sh" && \
+     nvm use && \
+     npm run dev
+   ```
+   Record the returned background task id.
+
+7. **Wait until Astro is serving.** Poll with `curl -s -o /dev/null -w "%{http_code}" http://localhost:4321/` until it returns 200 (typically 2–5 seconds). Don't tell the user the URL before this check passes.
+
+8. **Tell the user** the URL `http://localhost:4321/` and the background task id (so they can stop it later with `kill <pid>` if needed). Pages live-reload on file save; subsequent `.mdx` writes appear automatically.
+
+After setup, every subsequent invocation just runs the normal per-file workflow. The dev server keeps running across invocations in the same session.
 
 ## Per-file workflow
 
@@ -279,7 +304,7 @@ What happens when the user clicks a token:
 - **Does not edit source code without explicit approval.** Source files are read-only by default — only `.mdx` files under `docs/learning/src/pages/` are written. The single exception is **doc-first mode** (above): the user reviews the rendered preview, then explicitly approves writing a brand-new source file. Existing source files are never modified.
 - **Does not commit.** `docs/learning/` is gitignored by convention; nothing here is meant for the repo's history.
 - **Does not auto-track new source files.** When a new source file lands, this skill writes its `.mdx` only when asked.
-- **Does not run the dev server.** The user runs `npm run dev` themselves.
+- **Does not stop the dev server.** Once started during initial setup, it stays running for live-reload as new `.mdx` files are added. The user kills it themselves with `kill <pid>` when done.
 
 ## End-of-run summary
 
