@@ -31,11 +31,11 @@ export function tooltipTransformer(): ShikiTransformer {
 
           markers.push({
             line: lineIdx + 1,
-            col: result.length + (skip - afterMarker),
+            col: result.length,
             id: match[1],
           });
 
-          cursor = afterMarker;
+          cursor = skip;
         }
         result += line.slice(cursor);
         return result;

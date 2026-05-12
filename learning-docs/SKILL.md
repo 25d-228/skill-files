@@ -176,7 +176,7 @@ let /*[t:let-bind]*/ hklm = RegKey::predef /*[t:assoc-fn]*/ (HKEY_LOCAL_MACHINE 
 
 ### Marker syntax
 
-Place `/*[t:id]*/` immediately before the token to tag. Whitespace between the marker and the token is preserved; only the marker comment is removed. The marker tags the *first non-whitespace token* that follows it on the same line.
+Place `/*[t:id]*/` immediately before the token to tag. The marker and any whitespace immediately after it are stripped from the rendered source; whitespace before the marker is preserved as-is. So both `let /*[t:id]*/ x` (spaces around marker for readability) and `let /*[t:id]*/x` (flush) render as `let x`. The marker tags the *first non-whitespace token* that follows it on the same line.
 
 ```rust
 let /*[t:let-bind]*/ hklm = ...
