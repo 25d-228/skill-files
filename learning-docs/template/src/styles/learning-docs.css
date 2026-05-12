@@ -186,6 +186,7 @@ h1 {
 .intro code.ident, .pre-summary code.ident { color: var(--ident); }
 .intro code.punc,  .pre-summary code.punc  { color: var(--punc); }
 
+
 /* ============================================
    Main code block — Shiki output
    Shiki applies inline color styles per token; we add the wrapping chrome.
@@ -412,6 +413,11 @@ aside.annotations { display: none; }
 .chip.done {
   background: rgba(133, 153, 0, 0.16);
   color: var(--green);
+}
+
+.chip.updated {
+  background: rgba(181, 137, 0, 0.18);
+  color: var(--yellow);
 }
 
 .legend {

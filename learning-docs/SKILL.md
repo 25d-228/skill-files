@@ -264,7 +264,33 @@ The doc functions as a spec/preview the user reviews before authorizing the code
 </li>
 ```
 
+### File row — updated (clickable link, yellow chip):
+
+```astro
+<li>
+  <a class="file-row" href="/src/main.py/">
+    <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg></span>
+    main.py
+    <span class="chip updated">updated</span>
+  </a>
+</li>
+```
+
 The `href` is `/<mirrored path>/` — Astro maps `src/pages/src/main.py.mdx` to URL `/src/main.py/`.
+
+### Chip lifecycle: todo → updated → done
+
+There are three states. The chip class swap is the *entire* signaling system — no per-page banners, no changelogs.
+
+| State     | Class               | Meaning                                                          |
+|-----------|---------------------|------------------------------------------------------------------|
+| `todo`    | `chip` (grey)       | No `.mdx` page yet. Row is a non-clickable `<div class="file-row todo">`. |
+| `updated` | `chip updated` (yellow) | Page exists; file was **touched in the most recent slice**.   |
+| `done`    | `chip done` (green) | Page exists; file is stable since the last slice that touched it. |
+
+**The rule at the start of every slice:** before writing new MDX content, walk the index and flip every `chip updated` → `chip done`. That clears the "fresh" marker from the previous slice. Then, as you touch each file in the new slice, set its chip to `chip updated`. Files that get a brand-new `.mdx` for the first time (was `todo`) go straight to `updated`, skipping `done`.
+
+After this routine, exactly the files modified during the current slice show the yellow `updated` chip, and the user can scan the home tree to know what's fresh.
 
 ## Tooltip granularity
 
