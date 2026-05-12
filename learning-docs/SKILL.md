@@ -2,67 +2,172 @@
 
 > **Invocation:** Per-session skill. Use only when explicitly invoked (e.g. `/learning-docs`). Do not auto-trigger on phrases like "explain this code", "write documentation", or "annotate this file". Once invoked in a session, keep applying this workflow to all subsequent learning-doc requests in the same session without re-invocation.
 
-Build a folder of click-to-toggle annotated HTML pages for a project's source files. Language-agnostic — works for Python, C, Rust, JS, Go, Java, anything. Each source file gets a sibling `.html` mirroring its filesystem path, rendered in Solarized Light + FiraCode Nerd Font with Material elevation, click-toggle tooltips on every meaningful token, and Pattern A explanations.
+Build an Astro static site under `docs/learning/` that mirrors a project's source tree, with one annotated page per source file. Each interactive token has a click-to-toggle tooltip (Pattern A: definition, Python/C analogy, concrete example, why-here) with an optional Example tab. Built with Astro + Shiki + a custom transformer that turns `/*[t:id]*/` comment markers in raw source into clickable buttons that surface a separate Markdown annotation block.
 
 ## When to use
 
 The user is learning a codebase — typically a junior dev on a new language or framework — and asks for a persistent project-wide learning record they can browse like a code editor.
 
-## File layout
+## Project layout
 
-Mirror the real source tree under `docs/learning/` with `.html` appended to each filename. Add the folder to `.gitignore`.
+The skill ships a complete Astro project under `template/`. On first invocation in a new project, copy that folder wholesale to `docs/learning/`:
 
 ```
 docs/learning/
-├── index.html              # home: file tree, done/todo state
-├── styles.css              # shared (copy from this skill folder)
-├── script.js               # shared (copy from this skill folder)
-├── <root-manifest>.html    # mirrors any root file (pyproject.toml, Cargo.toml, package.json, Makefile, ...)
+├── .nvmrc                              # Node 24 (latest LTS)
+├── package.json                        # Astro + MDX + Shiki
+├── astro.config.mjs                    # registers tooltipTransformer
+├── tsconfig.json                       # @/* path alias
 └── src/
-    └── <file>.<ext>.html   # mirrors each source file by full path
+    ├── components/
+    │   ├── Annotations.astro           # <Annotations>
+    │   ├── A.astro                     # <A id="..." kind="...">
+    │   ├── Summary.astro               # <Summary>
+    │   └── learning-docs.ts            # barrel re-export
+    ├── layouts/
+    │   ├── PageLayout.astro            # per-file page chrome
+    │   └── IndexLayout.astro           # home page chrome
+    ├── lib/
+    │   └── tooltipTransformer.ts       # custom Shiki transformer
+    ├── styles/
+    │   └── learning-docs.css
+    ├── scripts/
+    │   └── learning-docs.js            # popover click handler
+    └── pages/
+        └── index.astro                 # home with file tree (starts empty)
 ```
 
-Stylesheet + script link paths are **depth-relative** (use the same depth-prefix for both):
+Each documented source file becomes an `.mdx` under `src/pages/`, mirroring the real path. For example:
 
-| Page depth (under `docs/learning/`) | Prefix |
-|---|---|
-| 0 (index.html) | `` (empty) |
-| 1 | `../` |
-| 2 | `../../` |
-| 3 | `../../../` |
+| Real source path        | Becomes                              | Served at         |
+|-------------------------|--------------------------------------|-------------------|
+| `src/main.rs`           | `src/pages/src/main.rs.mdx`          | `/src/main.rs/`   |
+| `pyproject.toml`        | `src/pages/pyproject.toml.mdx`       | `/pyproject.toml/`|
+| `src-tauri/src/lib.rs`  | `src/pages/src-tauri/src/lib.rs.mdx` | `/src-tauri/src/lib.rs/` |
 
 ## Initial setup
 
 On the first invocation in a project where `docs/learning/` doesn't exist yet, do these steps before anything else:
 
-1. **Create** the directory `docs/learning/`.
-2. **Copy** `styles.css` and `script.js` from this skill's folder (the directory holding this `SKILL.md`) into `docs/learning/`. Read each file and write its content unchanged to the target path; do not modify.
-3. **Add** `/docs/learning/` to the project's `.gitignore`. If `.gitignore` doesn't exist, create it with that single line.
-4. **Write** `docs/learning/index.html` by copying `index-template.html` from this skill's folder and replacing `{PROJECT_NAME}` (twice). Start with an empty `.tree` (no `<li>` entries) unless running in backfill mode (see "Backfilling existing code"), in which case pre-populate every discovered source file as `todo`.
+1. **Copy** the skill's `template/` directory wholesale to `docs/learning/`. Read each file under `template/` and write it unchanged to the matching path under `docs/learning/`.
+2. **Add** `/docs/learning/` to the project's `.gitignore`. If `.gitignore` doesn't exist, create it with that single line.
+3. **Tell the user** to run, from `docs/learning/`:
+   ```
+   nvm install
+   nvm use
+   npm install
+   npm run dev
+   ```
+   `nvm install` reads `.nvmrc` (latest Node LTS) and installs that version. `npm run dev` starts Astro at `http://localhost:4321/`. The user opens that URL in their browser; pages refresh on file save.
+4. **Set the project name** in `src/pages/index.astro` (replace the `project="learning-docs"` prop on `<IndexLayout>` with the real project name).
 
-After setup is complete, every subsequent invocation just runs the normal workflow.
+After setup, every subsequent invocation just runs the normal per-file workflow.
 
-## Workflow
+## Per-file workflow
 
-Per file to be documented:
+For each source file to be documented:
 
-1. **Draft + write.** Read the source, compose the annotated HTML in working memory, then `Write` it to disk and `Edit` `docs/learning/index.html` to flip that entry from `todo` → `done` (i.e., replace `<div class="file-row todo">…<span class="chip">todo</span></div>` with `<a class="file-row" href="…">…<span class="chip done">done</span></a>`). The rendered page is now live — the user can refresh their browser to verify it renders correctly with proper tooltips and styling.
-2. **Show the source code being explained.** Paste the raw source file's content (Rust / Python / etc.) into chat as a fenced code block. Do NOT paste the HTML markup. Do NOT list planned tooltips. The user compares the rendered page (in browser) against the source (in chat).
-3. **Ask for confirmation.** End with a clear yes/no question — *"Looks good?"* or *"Move on?"*. If yes, advance to the next file. If no, fix in place.
-4. **Don't expand scope silently.** Never add or remove files from the planned list without confirming with the user.
+1. **Draft + write the `.mdx`.** Read the real source, compose the annotated MDX in working memory, then `Write` it to `src/pages/<mirrored path>.mdx`. Astro's dev server picks it up live.
+2. **Update `index.astro`** — add a `<li>` entry for the new file in the appropriate folder under the `<ul>` in `<IndexLayout>`. Flip the chip from `todo` → `done` when the page is written (see "Index entries" below).
+3. **Show the source code being explained.** Paste the raw source file's content (Rust / Python / etc.) into chat as a fenced code block. Do NOT paste the MDX. Do NOT list planned tooltips. The user compares the rendered page (in browser) against the source (in chat).
+4. **Ask for confirmation.** End with a clear yes/no question — *"Looks good?"* or *"Move on?"*. If yes, advance to the next file. If no, fix in place.
+5. **Don't expand scope silently.** Never add or remove files from the planned list without confirming with the user.
 
-In **batch backfill mode** (see "Backfilling existing code"), step 3's confirmation is granted ONCE for the full file list — the agent writes pages sequentially without re-asking per file unless something surprising appears.
+In **batch backfill mode** (see "Backfilling existing code"), step 4's confirmation is granted ONCE for the full file list — pages are written sequentially without re-asking per file unless something surprising appears.
+
+## .mdx file shape
+
+Each per-file page is an `.mdx` file with this skeleton:
+
+```mdx
+---
+title: src/registry.rs
+layout: '@/layouts/PageLayout.astro'
+---
+import { Annotations, A, Summary } from '@/components/learning-docs';
+
+<Summary>
+**What is this file for?**
+
+One short paragraph: purpose + closest analog in the user's known languages.
+</Summary>
+
+```rust
+let /*[t:let-bind]*/ hklm = RegKey::predef /*[t:assoc-fn]*/ (HKEY_LOCAL_MACHINE /*[t:hkey]*/);
+```
+
+<Annotations>
+  <A id="let-bind" kind="kw">
+    Introduces an immutable binding. Like Python's `x = ...` or C's `const` — but the binding itself is what's frozen, not the value's type.
+
+    ```rust
+    let count = 42;
+    let mut name = String::new();
+    ```
+  </A>
+  <A id="assoc-fn" kind="fn">
+    Associated-function call — `Type::method` pattern. Like a Python `@classmethod` or C++ static member: belongs to the type, not an instance.
+
+    ```rust
+    impl Point {
+        fn origin() -> Self { Point { x: 0, y: 0 } }
+    }
+    ```
+  </A>
+  <A id="hkey" kind="type">
+    Predefined Windows registry root key constant. Like a C `#define` exporting a magic handle — the machine-wide registry hive.
+
+    ```rust
+    // other roots:
+    HKEY_CURRENT_USER
+    HKEY_CLASSES_ROOT
+    ```
+  </A>
+</Annotations>
+```
+
+### Required pieces
+
+- **Frontmatter** — `title` (the real source path, used in the app bar) and `layout` (always `'@/layouts/PageLayout.astro'`).
+- **Component import** — one line: `import { Annotations, A, Summary } from '@/components/learning-docs';`.
+- **`<Summary>`** — one short paragraph framing the file. Renders as the pre-summary card.
+- **Fenced code block** — the real source file's content (or the relevant excerpt), with `/*[t:id]*/` markers tagging the tokens that will have tooltips.
+- **`<Annotations>` block** — one `<A id="..." kind="...">` per marker id, body is Markdown.
+
+### Marker syntax
+
+Place `/*[t:id]*/` immediately before the token to tag. Whitespace between the marker and the token is preserved; only the marker comment is removed. The marker tags the *first non-whitespace token* that follows it on the same line.
+
+```rust
+let /*[t:let-bind]*/ hklm = ...
+```
+
+For a multi-segment call like `RegKey::predef`, the marker tags only `RegKey` (the first span). Clicking `RegKey` opens the explanation for the whole call — that's fine.
+
+Use comment syntax appropriate for the file's language at the marker position **except** that the `/*…*/` form works for any language because the transformer matches the literal `/*[t:…]*/` pattern. For languages without block comments, the marker is still parsed correctly as long as it appears in the source string (it will look syntactically broken to the language, but the transformer strips it before Shiki tokenizes). Stick to `/*[t:…]*/` regardless of language.
+
+### Annotation body — Markdown
+
+Each `<A>` body is plain Markdown. Use:
+
+- Backticks for inline code: `` `Type::method` ``
+- Fenced code blocks for the Example tab. **The first fenced code block inside the `<A>` body becomes the Example tab; everything else is the Explanation.**
+- Standard Markdown emphasis, lists, links
+
+### `kind` attribute
+
+`<A kind="...">` accepts: `kw` (green), `type` (yellow), `fn` (blue), `str` (cyan), `ident` (blue), `attr` (blue). Sets the popover's left-border color. Defaults to `ident` if omitted.
 
 ## Backfilling existing code
 
 When the user invokes the skill on a repo that already has source files (instead of writing new code one-at-a-time), switch to batch mode:
 
-1. **Discover** source files with `Glob` using the project's primary extensions (e.g. `**/*.rs`, `**/*.py`, `**/*.ts`). Skip generated/vendored folders: `node_modules`, `target`, `dist`, `build`, `__pycache__`, `.svelte-kit`, `.next`, etc.
+1. **Discover** source files with `Glob` using the project's primary extensions (e.g. `**/*.rs`, `**/*.py`, `**/*.ts`). Skip generated/vendored folders: `node_modules`, `target`, `dist`, `build`, `__pycache__`, `.svelte-kit`, `.next`, `docs/learning/**`, etc.
 2. **Order** the list sensibly — entry points and manifests first (`main.py`, `lib.rs`, `index.ts`, `pyproject.toml`, `Cargo.toml`), then files closer to the leaves of the dependency graph.
-3. **Pre-populate** `index.html` with every discovered file marked `todo`. Show the full ordered list to the user once.
+3. **Pre-populate** `index.astro` with every discovered file marked `todo`. Show the full ordered list to the user once.
 4. **Get one approval for the whole batch** — e.g. *"Found 28 files. Write all 28 pages in this order? [list]"* — instead of asking per file.
-5. **Write each `.html` in sequence** without re-asking, AS LONG AS nothing surprising appears. Stop and check in if: a file is way larger than expected, uses an unfamiliar construct that needs discussion, or seems intentionally out of scope (test fixtures, generated code).
-6. **Update `index.html`** after each file (`todo` → `done`) so the user can refresh and watch progress.
+5. **Write each `.mdx` in sequence** without re-asking, as long as nothing surprising appears. Stop and check in if a file is way larger than expected, uses an unfamiliar construct that needs discussion, or seems intentionally out of scope (test fixtures, generated code).
+6. **Update `index.astro`** after each file (`todo` → `done`) so the user can refresh and watch progress.
 
 For very small repos (≤5 files), skip batching — the standard per-step workflow is fast enough.
 
@@ -70,103 +175,112 @@ For very small repos (≤5 files), skip batching — the standard per-step workf
 
 When the user is **building** the project rather than learning an existing one — they want docs for a code file or snippet that hasn't been written to disk yet — invert the order: render the doc first as a preview, then write the source only after approval.
 
-1. **Draft + write the `.html` first.** Compose the annotated HTML for the proposed code (same `page-template.html`, same Pattern A tooltips, same color classes), then `Write` it to `docs/learning/<path>.<ext>.html` and add the row to `index.html` as `done`. The rendered page is now live — the user can read it in Simple Browser as a preview of what the source file will be.
+1. **Draft + write the `.mdx` first.** Compose the annotated MDX for the proposed code (same template, same Pattern A tooltips), `Write` it to `src/pages/<path>.mdx`, and add the row to `index.astro` as `done`. The rendered page is now live — the user can read it in their browser as a preview of what the source file will be.
 2. **Paste the proposed source** in chat as a fenced code block, exactly as it would appear on disk. The user compares the rendered page (in browser) against the proposed source (in chat).
 3. **Ask for permission to write the source file.** End with a clear yes/no question, e.g. *"Write `src/foo.rs` now?"*. Until the user approves, do NOT touch any source file.
-4. **On approval**, `Write` the source file at the real path. On rejection or revision requests, update both the `.html` and the proposed snippet in chat, then re-ask — never write a source file the user has not approved.
+4. **On approval**, `Write` the source file at the real path. On rejection or revision requests, update both the `.mdx` and the proposed snippet in chat, then re-ask — never write a source file the user has not approved.
 
 The doc functions as a spec/preview the user reviews before authorizing the code write. This is the only mode in which this skill writes source files.
 
-## Page template
+## Index entries
 
-Every annotated page (everything except `index.html`) uses the skeleton in `page-template.html` next to this SKILL.md. Copy it, replace these placeholders:
+`src/pages/index.astro` holds the file tree. Each new page added needs a corresponding `<li>` entry; flipping `todo` → `done` is just swapping the wrapper element.
 
-- `{PROJECT_NAME}` — the project's display name (e.g., `steam-mate`).
-- `{TITLE}` — the source file's path inside the repo (e.g., `src-tauri/src/error.rs`).
-- `{PREFIX}` — the depth-relative prefix from the table above (empty / `../` / `../../` / ...).
+### Folder row (non-clickable, holds nested `<ul>`):
 
-Then fill in the `What is this file for?` paragraph and replace the `<!-- source code with .tok / .tip annotations -->` placeholder with the annotated source (see "Tooltip syntax" below).
-
-## Index template
-
-The home `index.html` has its own markup — app bar without a back button (title is a `<div>`, not an `<a>`), an intro card, then the file tree. Skeleton lives in `index-template.html` next to this SKILL.md. Copy it, replace `{PROJECT_NAME}` (twice — title and app bar), and populate `.tree` with `<li>` entries per file/folder. The HTML comment inside the template shows the exact markup for folder rows, file rows in `done` state, and file rows in `todo` state.
-
-When a file moves from `todo` → `done`, replace the `<div class="file-row todo">…</div>` with the `<a class="file-row" href="…">…</a>` form, and flip the chip span from `<span class="chip">todo</span>` to `<span class="chip done">done</span>`.
-
-## Tooltip syntax
-
-Each interactive token has two pages: an **Explanation** (default) and an **Example** (minimal boilerplate showing the concept in isolation). Tabs at the top of the popup switch between them.
-
-```html
-<span class="tok tip-left" tabindex="0"><span class="kw">def</span><span class="tip"><div class="tip-tabs"><button class="tip-tab active" data-target="explain">Explanation</button><button class="tip-tab" data-target="example">Example</button></div><div class="tip-page tip-page-explain active">Explanation text with inline <code class="type">Type</code> and <code class="fn">method</code> references.</div><div class="tip-page tip-page-example"><pre><code><span class="kw">def</span> <span class="fn">greet</span><span class="punc">(</span><span class="ident">name</span><span class="punc">):</span>
-    <span class="kw">return</span> <span class="fn">f</span><span class="str">"Hello, {name}"</span></code></pre></div></span></span>
+```astro
+<li>
+  <div class="folder-row">
+    <span class="icon"><svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg></span>
+    src/
+  </div>
+  <ul>
+    {/* child rows */}
+  </ul>
+</li>
 ```
 
-- **`.tok`** — interactive token; shows a dotted underline. Always include `tabindex="0"` for keyboard access.
-- **`.tip`** — popover, child of `.tok`. Hidden until the `.tok` is clicked.
-- **`.tip-left`** / **`.tip-right`** — anchor the popover to the left/right edge instead of centering. Use `.tip-left` near the start of a line, `.tip-right` near the end of a line, and no modifier in the middle.
-- **`.tip-tabs`** — the tab bar at the top of the popup. Two buttons with `data-target="explain"` and `data-target="example"`.
-- **`.tip-page-explain`** — the explanation page; gets `.active` by default.
-- **`.tip-page-example`** — the example page; contains a `<pre><code>...</code></pre>` block. Highlight the example with the same token color classes used in the main code block (`.kw`, `.type`, `.fn`, etc.).
+### File row — done (clickable link, green chip):
 
-Click-to-toggle and tab switching are handled entirely by `script.js`. No per-page wiring needed. The script also auto-positions the popup to stay inside the viewport — tooltips near a page edge get shifted to remain fully visible.
-
-**Granularity rule.** Each `.tok` should teach exactly **one** concept. Wrap sub-expressions and named concepts, not whole lines. Aim for 3–6 separate tooltips per non-trivial line.
-
-Bad — one giant tooltip on a whole line mixing multiple ideas:
-
-```html
-<span class="tok"><span class="kw">let</span> <span class="ident">hklm</span> <span class="punc">=</span> <span class="type">RegKey</span><span class="punc">::</span><span class="fn">predef</span><span class="punc">(</span><span class="type">HKEY_LOCAL_MACHINE</span><span class="punc">);</span><span class="tip">Long paragraph explaining `let`, the associated-function pattern, and the constant all at once...</span></span>
+```astro
+<li>
+  <a class="file-row" href="/src/main.py/">
+    <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg></span>
+    main.py
+    <span class="chip done">done</span>
+  </a>
+</li>
 ```
 
-Good — three separate tooltips, one concept each:
+### File row — todo (not clickable, grey chip):
 
-```html
-<span class="tok"><span class="kw">let</span><span class="tip">Introduces an immutable binding...</span></span>
-<span class="ident">hklm</span> <span class="punc">=</span>
-<span class="tok"><span class="type">RegKey</span><span class="punc">::</span><span class="fn">predef</span><span class="tip">Associated-function call — Type::name() pattern...</span></span><span class="punc">(</span><span class="tok"><span class="type">HKEY_LOCAL_MACHINE</span><span class="tip">Predefined Windows registry root key constant...</span></span><span class="punc">);</span>
+```astro
+<li>
+  <div class="file-row todo">
+    <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg></span>
+    helpers.py
+    <span class="chip">todo</span>
+  </div>
+</li>
+```
+
+The `href` is `/<mirrored path>/` — Astro maps `src/pages/src/main.py.mdx` to URL `/src/main.py/`.
+
+## Tooltip granularity
+
+Each marker should teach exactly **one** concept. Wrap sub-expressions and named concepts, not whole expressions. Aim for 3–6 markers per non-trivial line.
+
+**Bad** — one marker on a whole expression mixing multiple ideas:
+
+```rust
+/*[t:everything]*/ let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+```
+
+**Good** — three markers, one concept each:
+
+```rust
+let /*[t:let-bind]*/ hklm = RegKey::predef /*[t:assoc-fn]*/ (HKEY_LOCAL_MACHINE /*[t:hkey]*/);
 ```
 
 **Skip pure syntactic glue** (`=`, `(`, `;`, `,`, `{}`). Wrapping every punctuation mark is noise. Named concepts, sub-expressions, operators with semantics (`?`, `&`, `as`), keywords, type names, and call patterns get tooltips. Raw punctuation doesn't.
 
-## Token color classes
-
-Use the same classes inside `.code`, inside `.tip code`, and inside `.pre-summary code`:
-
-| Class | Color | For |
-|---|---|---|
-| `.kw` | green | Language keywords — Python `def`/`class`/`if`/`for`, C `struct`/`static`/`return`, JS `function`/`const`, Rust `use`/`fn`, etc. |
-| `.type` | yellow | Type names — built-ins (`int`, `str`, `void`, `bool`) and user-defined classes/structs/enums; enum variants |
-| `.fn` | blue | Function names, method calls, macro names, decorator/annotation names |
-| `.str` | cyan | String literals, char literals |
-| `.ident` | blue | Plain identifiers, parameter names, variable names |
-| `.punc` | muted | `()`, `[]`, `{}`, `.`, `,`, `::`, `->`, operators |
-| `.comment` | muted italic | `#`, `//`, `/* */` — any comment syntax |
-| `.attr` | blue | Decorators / annotations / attribute macros — Python `@decorator`, Java `@Annotation`, Rust `#[attr]` |
-
 ## Explanation style — Pattern A
 
-Each tooltip hits up to **four beats** in order. Drop beats that don't apply, but never skip beat 1.
+Each `<A>` body hits up to **four beats** in order. Drop beats that don't apply, but never skip beat 1.
 
 1. **Definition.** One short line — what the token *is* in language terms.
-2. **Analogy.** Anchor analogies on **Python** and **C** by default — they cover most concepts a beginner-to-intermediate programmer recognizes. Pivot to other languages only if `user_role.md` says the user knows them better.
+2. **Analogy.** Anchor analogies on **Python** and **C** by default — they cover most concepts a beginner-to-intermediate programmer recognizes. Pivot to other languages only if memory tells you the user knows them better.
    - **C** — pointers, references, lifetimes (`&T` ≈ `T*`, immutable strings ≈ `const char *` in `.rodata`), manual memory (`malloc`/`free`), tagged unions, `#ifdef`, stack vs heap, function pointers, header/source split.
    - **Python** — nullable / optional types (≈ `None` or exceptions), iterators, closures (≈ lambdas), decorators (`@decorator` ≈ attribute macros / annotations), dict/list/tuple ↔ HashMap/Vec/tuple, duck typing (≈ structural typing / trait bounds), `__init__.py` ≈ module entry point.
-3. **Concrete example or signature.** What shape the token takes in *this* code — actual JSON, actual return type, actual sample input/output. (Longer-form runnable examples belong on the **Example** tab as a separate `<pre><code>` block, not crammed into the explanation prose.)
+3. **Concrete example or signature.** What shape the token takes in *this* code — actual JSON, actual return type, actual sample input/output. (Longer-form runnable examples belong in a separate fenced code block — that becomes the Example tab.)
 4. **Why-here.** Connect to the surrounding code's intent — why this token was used in this spot.
 
-**Example tab content.** Every tooltip's Example tab should hold a ~3–6 line, self-contained, syntax-highlighted snippet showing the concept in isolation. Use generic identifiers (`add`, `Point`, `User`, `greet`) rather than identifiers from the current file — the example should make sense even if the reader hasn't seen the project. Highlight with the same token color classes (`.kw`, `.type`, `.fn`, `.str`, `.ident`, `.punc`, `.attr`, `.comment`) as the main code block.
+**Example tab content.** Place a ~3–6 line, self-contained code snippet as a fenced code block inside the `<A>` body. Use generic identifiers (`add`, `Point`, `User`, `greet`) rather than identifiers from the current file — the example should make sense even if the reader hasn't seen the project. Shiki highlights it automatically.
 
-**Coverage depth — file-scoped, not project-scoped.** Every meaningful token gets a full Pattern A tooltip in its **first appearance per file**, even when that concept appeared in another file. The reader of any single file may have never opened another — each file must stand alone as a complete learning unit. *Within* the same file, repeat appearances of a concept can be skipped (no second tooltip on the same idea).
+**Coverage depth — file-scoped, not project-scoped.** Every meaningful token gets a full Pattern A tooltip in its **first appearance per file**, even when that concept appeared in another file. The reader of any single file may have never opened another — each file must stand alone as a complete learning unit. *Within* the same file, repeat appearances of a concept can be skipped (no second marker on the same idea).
 
-In practice: write each file's tooltips as if you've never explained anything before. The skill never "remembers" prior files.
+In practice: write each file's annotations as if you've never explained anything before. The skill never "remembers" prior files.
+
+## Data flow (reference)
+
+What happens when the user clicks a token:
+
+1. **Agent writes** `src/pages/<path>.mdx` with frontmatter + Summary + fenced code (with markers) + Annotations block.
+2. **Astro/MDX parser** splits the file: frontmatter becomes page metadata; fenced code is handed to Shiki; the `<Annotations>` JSX tree is rendered by Astro.
+3. **Shiki + custom transformer** (`src/lib/tooltipTransformer.ts`):
+   - `preprocess` hook scans source for `/*[t:id]*/`, records `{line, col, id}`, strips the marker.
+   - `span` hook wraps the span at the recorded position with `data-tip="id"` and class `tok`.
+4. **`<Annotations>` + `<A>` components** render to a hidden `<aside class="annotations" hidden>` containing one `<div data-anno="id" data-kind="...">…rendered Markdown…</div>` per annotation.
+5. **Astro emits static HTML** combining page chrome + code block + hidden aside, plus the shared `learning-docs.css` and bundled `learning-docs.js`.
+6. **Browser runtime** — `learning-docs.js` listens for clicks on `[data-tip]`, finds the matching `[data-anno]`, clones its content into a `.tip` popover positioned next to the clicked token. The first `<pre>` in the cloned content becomes the Example tab; the rest is the Explanation. Esc closes; viewport-aware positioning keeps the popover on-screen.
 
 ## What this skill does NOT do
 
-- **Does not edit source code without explicit approval.** Source files are read-only by default — only `.html` files under `docs/learning/` are written. The single exception is **doc-first mode** (above): the user reviews the rendered preview, then explicitly approves writing a brand-new source file. Existing source files are never modified.
+- **Does not edit source code without explicit approval.** Source files are read-only by default — only `.mdx` files under `docs/learning/src/pages/` are written. The single exception is **doc-first mode** (above): the user reviews the rendered preview, then explicitly approves writing a brand-new source file. Existing source files are never modified.
 - **Does not commit.** `docs/learning/` is gitignored by convention; nothing here is meant for the repo's history.
-- **Does not auto-track new source files.** When a new source file lands, this skill writes its `.html` only when asked.
+- **Does not auto-track new source files.** When a new source file lands, this skill writes its `.mdx` only when asked.
+- **Does not run the dev server.** The user runs `npm run dev` themselves.
 
 ## End-of-run summary
 
-After each write, tell the user the absolute path created/updated and (if applicable) which `index.html` entry flipped from `todo` → `done`. One sentence.
+After each `.mdx` write, tell the user the absolute path created/updated and (if applicable) which `index.astro` entry flipped from `todo` → `done`. One sentence.

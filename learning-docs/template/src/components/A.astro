@@ -1,0 +1,10 @@
+---
+interface Props {
+  id: string;
+  kind?: 'kw' | 'type' | 'fn' | 'str' | 'ident' | 'punc' | 'comment' | 'attr';
+}
+const { id, kind } = Astro.props;
+---
+<div data-anno={id} data-kind={kind ?? 'ident'}>
+  <slot />
+</div>

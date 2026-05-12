@@ -1,0 +1,44 @@
+---
+import '@/styles/learning-docs.css';
+
+interface Props {
+  project: string;
+}
+
+const { project } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{project} — learning docs</title>
+</head>
+<body>
+
+<header class="app-bar">
+  <div class="app-bar-title">{project} — learning docs</div>
+</header>
+
+<main class="page">
+
+<div class="intro">
+  <strong>What is this?</strong><br>
+  Annotated explanations for every source file in the project, mirroring the
+  real directory layout. Click a file below to read the code with inline
+  tooltips. Files marked <em>todo</em> will be filled in as we add or revisit
+  them.
+</div>
+
+<div class="tree">
+  <slot />
+</div>
+
+<div class="legend">
+  Tap a <strong>done</strong> file to open its annotated page. Todo entries
+  fill in as we write or revisit their source.
+</div>
+
+</main>
+
+</body>
+</html>

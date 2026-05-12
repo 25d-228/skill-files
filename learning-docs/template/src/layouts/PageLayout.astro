@@ -1,0 +1,40 @@
+---
+import '@/styles/learning-docs.css';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    project?: string;
+  };
+}
+
+const { frontmatter } = Astro.props;
+const title = frontmatter.title;
+const project = frontmatter.project ?? 'learning-docs';
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{title} — {project}</title>
+</head>
+<body>
+
+<header class="app-bar">
+  <a href="/" class="back-btn" aria-label="Back to home">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </a>
+  <a class="app-bar-title" href="/">{title}</a>
+</header>
+
+<main class="page">
+  <div class="sub">Click the dotted tokens to see the explanation.</div>
+  <slot />
+</main>
+
+<script>
+  import '@/scripts/learning-docs.js';
+</script>
+
+</body>
+</html>
