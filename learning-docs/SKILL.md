@@ -86,7 +86,22 @@ On the first invocation in a project where `docs/learning/` doesn't exist yet, t
 
 8. **Tell the user** the URL `http://localhost:4321/` and the background task id (so they can stop it later with `kill <pid>` if needed). Pages live-reload on file save; subsequent `.mdx` writes appear automatically.
 
-After setup, every subsequent invocation just runs the normal per-file workflow. The dev server keeps running across invocations in the same session.
+## On every invocation (server health check)
+
+`docs/learning/` may already exist from a prior session, but the dev server does *not* survive session compaction, agent restarts, or the user closing the terminal. The agent's task list is fresh on a new session, so a server that was running before is invisible — and may not even be running anymore.
+
+**At the start of every invocation** (after the initial-setup branch, or skipping it if `docs/learning/` already exists), probe the server:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:4321/
+```
+
+- **200** → server is up. Proceed to the per-file workflow. Do not restart it.
+- **anything else / connection refused** → server is down. Re-run **step 6** (start dev server in background) and **step 7** (poll until 200) from the initial setup. Then tell the user the new background task id and proceed.
+
+Do this silently if the server is already up (no need to narrate a successful health check). Only mention the server when you actually had to start it.
+
+After this check passes, every subsequent invocation just runs the normal per-file workflow.
 
 ## Per-file workflow
 
