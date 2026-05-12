@@ -326,3 +326,204 @@ code {
   column-gap: 2rem;
   padding-left: 1rem;
 }
+
+/* ============ Chart wrapper (vanilla SVG charts) ============ */
+
+.chart {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  margin: 1rem 0;
+}
+.chart svg { display: block; width: 100%; height: auto; }
+.chart .axis-label { fill: var(--fg-muted); font-size: 0.72rem; font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+.chart .axis-line  { stroke: var(--fg-muted); stroke-width: 1; }
+.chart .grid-line  { stroke: var(--border); stroke-width: 1; stroke-dasharray: 2,2; }
+.chart .bar  { fill: var(--blue); }
+.chart .line { fill: none; stroke: var(--blue); stroke-width: 2; }
+.chart .dot  { fill: var(--blue); }
+
+/* ============ Heatmap (colored table cells) ============ */
+
+.heatmap {
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: 0.85rem;
+  margin: 1rem 0;
+  background: transparent;
+  box-shadow: none;
+  width: auto;
+}
+.heatmap th,
+.heatmap td {
+  padding: 0.35rem 0.55rem;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: none;
+  font-variant-numeric: tabular-nums;
+}
+.heatmap thead th {
+  background: transparent;
+  color: var(--fg-muted);
+  font-weight: 500;
+  font-size: 0.78rem;
+  position: static;
+}
+.heatmap tbody td {
+  background: var(--bg-elev);
+  color: var(--fg);
+  border-radius: 3px;
+}
+.heatmap tbody td.hm-label {
+  background: transparent;
+  color: var(--fg-muted);
+  font-weight: 500;
+  text-align: right;
+}
+
+/* ============ Tabs (click-driven) ============ */
+
+.tabs {
+  margin: 1rem 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elev);
+  overflow: hidden;
+}
+.tab-labels {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.tab-label {
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+  color: var(--fg-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  user-select: none;
+  font-size: 0.9rem;
+}
+.tab-label:hover { color: var(--fg); }
+.tab-label.is-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab-panel { display: none; padding: 1rem; }
+.tab-panel.is-active { display: block; }
+
+/* ============ Details / collapsible ============ */
+
+details {
+  margin: 0.5rem 0;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 0.85rem;
+}
+details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--fg);
+  list-style: none;
+}
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸  "; color: var(--fg-muted); }
+details[open] > summary::before { content: "▾  "; }
+details > *:not(summary) { margin-top: 0.5rem; }
+
+/* ============ DAG / SVG graph wrapper ============ */
+
+.dag {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.85rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+.dag svg { display: block; margin: 0 auto; }
+.dag .node-rect { fill: var(--bg); stroke: var(--fg-muted); stroke-width: 1; }
+.dag .node-text { fill: var(--fg); font-size: 0.82rem; font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+.dag .edge-path { fill: none; stroke: var(--fg-muted); stroke-width: 1.2; }
+.dag .edge-label { fill: var(--fg-muted); font-size: 0.72rem; }
+
+/* ============ Walkthrough / stepper ============ */
+
+.wt {
+  margin: 1.5rem 0;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.25rem 1.25rem;
+}
+.wt-pips {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+.wt-pip {
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--bg);
+  color: var(--fg-muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+.wt-pip.is-active { background: var(--accent); color: var(--header-fg); border-color: var(--accent); }
+.wt-pip.is-past   { background: var(--bg-row); color: var(--fg-soft); }
+.wt-stage-label {
+  font-size: 0.74rem;
+  color: var(--fg-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.3rem;
+}
+.wt-desc {
+  min-height: 4.5em;
+  color: var(--fg);
+  font-size: 0.95rem;
+  margin-bottom: 0.85rem;
+}
+.wt-body {
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wt-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.85rem;
+}
+.wt-btn {
+  padding: 0.4rem 0.9rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--fg);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+.wt-btn:hover:not(:disabled) { background: var(--bg-hover); }
+.wt-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ============ Building-up state classes ============ */
+
+.is-dim    { opacity: 0.30; transition: opacity 0.2s; }
+.is-past   { opacity: 0.55; transition: opacity 0.2s; }
+.is-on     { opacity: 1;    transition: opacity 0.2s; }
+.is-active { opacity: 1;    transition: opacity 0.2s; filter: drop-shadow(0 0 4px var(--accent)); }

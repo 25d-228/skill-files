@@ -1,0 +1,108 @@
+<!-- ============================================================
+USAGE — Interactive walkthrough / stepper
+
+For step-by-step explanations where one click reveals one new piece.
+CSS classes are already in style.css.
+
+Markup of one walkthrough card:
+
+  <div class="wt" data-current="0">
+    <div class="wt-pips">
+      <span class="wt-pip" data-step="0">1</span>
+      <span class="wt-pip" data-step="1">2</span>
+      <span class="wt-pip" data-step="2">3</span>
+    </div>
+    <div class="wt-stage-label">Step <span class="wt-num">1</span> of 3</div>
+    <div class="wt-desc">
+      <div data-stage="0">First, we read the query token.</div>
+      <div data-stage="1" hidden>Then, we compute scores against each key.</div>
+      <div data-stage="2" hidden>Finally, we take the weighted sum of values.</div>
+    </div>
+    <div class="wt-body">
+      <!-- Persistent diagram. Use data-show on inner elements to control reveal. -->
+      <svg viewBox="0 0 400 200" width="400" height="200">
+        <g data-show="0,1,2">              <!-- always visible after step 0 -->
+        </g>
+        <g data-show="1,2" class="is-dim"> <!-- appears at step 1, stays after -->
+        </g>
+        <g data-show="2" class="is-dim">   <!-- appears only at step 2 -->
+        </g>
+      </svg>
+    </div>
+    <div class="wt-controls">
+      <button class="wt-btn wt-prev">← Prev</button>
+      <button class="wt-btn wt-next">Next →</button>
+    </div>
+  </div>
+
+Building-up convention (see also building-up.html notes):
+  - data-show on an element lists comma-separated stages it appears in.
+  - The engine sets .is-dim when not yet reached, .is-past when older,
+    .is-on when current.
+  - Past elements stay visible (slightly faded) — never wipe.
+  - Use the .wt-body min-height (set in style.css) to prevent layout jump.
+
+Inline the <script> below once near </body>.
+Keyboard: ← / → navigate the walkthrough under the cursor.
+============================================================ -->
+
+<script>
+(function () {
+  function parseShow(s) {
+    return s.split(',').map(x => parseInt(x.trim(), 10)).filter(n => !isNaN(n));
+  }
+
+  document.querySelectorAll('.wt').forEach(wt => {
+    const pips    = wt.querySelectorAll('.wt-pip');
+    const stages  = wt.querySelectorAll('[data-stage]');
+    const showEls = wt.querySelectorAll('[data-show]');
+    const numEl   = wt.querySelector('.wt-num');
+    const total   = pips.length;
+    let cur       = parseInt(wt.dataset.current, 10) || 0;
+
+    function render() {
+      wt.dataset.current = cur;
+      if (numEl) numEl.textContent = cur + 1;
+
+      pips.forEach((p, i) => {
+        p.classList.toggle('is-active', i === cur);
+        p.classList.toggle('is-past',   i  <  cur);
+      });
+
+      stages.forEach(s => {
+        s.hidden = parseInt(s.dataset.stage, 10) !== cur;
+      });
+
+      showEls.forEach(elx => {
+        const steps  = parseShow(elx.dataset.show);
+        const first  = Math.min(...steps);
+        const shown  = steps.includes(cur);
+        const past   = !shown && first < cur;
+        const future = !shown && first > cur;
+        elx.classList.toggle('is-on',   shown && !elx.classList.contains('is-active'));
+        elx.classList.toggle('is-past', past);
+        elx.classList.toggle('is-dim',  future);
+      });
+
+      const prev = wt.querySelector('.wt-prev'), next = wt.querySelector('.wt-next');
+      if (prev) prev.disabled = cur === 0;
+      if (next) next.disabled = cur === total - 1;
+    }
+
+    pips.forEach((p, i) => p.addEventListener('click', () => { cur = i; render(); }));
+    wt.querySelector('.wt-prev')?.addEventListener('click', () => { if (cur > 0)         { cur--; render(); } });
+    wt.querySelector('.wt-next')?.addEventListener('click', () => { if (cur < total - 1) { cur++; render(); } });
+
+    wt.tabIndex = 0;
+    render();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input, textarea, select')) return;
+    const wt = document.querySelector('.wt:hover, .wt:focus-within');
+    if (!wt) return;
+    if (e.key === 'ArrowRight') { wt.querySelector('.wt-next')?.click(); e.preventDefault(); }
+    if (e.key === 'ArrowLeft')  { wt.querySelector('.wt-prev')?.click(); e.preventDefault(); }
+  });
+})();
+</script>

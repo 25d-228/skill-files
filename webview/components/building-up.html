@@ -1,0 +1,50 @@
+<!-- ============================================================
+NOTES — Building-up reveal pattern (used inside .wt-body)
+
+CSS classes (already in style.css):
+  .is-dim     opacity 0.30   — not yet reached
+  .is-past    opacity 0.55   — older, still visible
+  .is-on      opacity 1.00   — current
+  .is-active  opacity 1.00 + glow — current and highlighted
+
+Authoring rules:
+  1. ONE persistent diagram per walkthrough card. Don't recreate per step.
+  2. Each element gets data-show="<comma-separated steps>" to say where
+     it appears. The stepper engine (stepper.html) toggles state classes.
+  3. Past elements STAY visible (faded). Never wipe content between steps.
+  4. The container that holds the diagram MUST have a fixed min-height
+     so the page doesn't shift when steps change. .wt-body already sets
+     min-height: 360px in style.css — use it, or set your own.
+  5. Use animation-delay only for the very first appearance of an element
+     within its step. Don't auto-loop animations; the user drives the
+     cadence with prev/next.
+
+Example — a 3-step explanation that builds up:
+
+  <svg viewBox="0 0 500 200" width="500" height="200">
+    <!-- Step 0: just the input token -->
+    <g data-show="0,1,2">
+      <rect x="20" y="80" width="80" height="40" rx="4" fill="#268bd2"/>
+      <text x="60" y="105" text-anchor="middle" fill="white">cat</text>
+    </g>
+
+    <!-- Step 1: add the embedding arrow + box -->
+    <g data-show="1,2">
+      <path d="M 100 100 L 180 100" stroke="#586e75" stroke-width="2" marker-end="url(#arrow)"/>
+      <rect x="180" y="80" width="80" height="40" rx="4" fill="#2aa198"/>
+      <text x="220" y="105" text-anchor="middle" fill="white">[0.3, 0.7, …]</text>
+    </g>
+
+    <!-- Step 2: add the projection -->
+    <g data-show="2">
+      <path d="M 260 100 L 340 100" stroke="#586e75" stroke-width="2" marker-end="url(#arrow)"/>
+      <rect x="340" y="80" width="80" height="40" rx="4" fill="#d33682"/>
+      <text x="380" y="105" text-anchor="middle" fill="white">Q</text>
+    </g>
+  </svg>
+
+Effect at each step:
+  cur=0  →  cat box on, arrow+emb dim, projection dim
+  cur=1  →  cat box past, arrow+emb on, projection dim
+  cur=2  →  cat box past, arrow+emb past, projection on
+============================================================ -->

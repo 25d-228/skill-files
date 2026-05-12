@@ -1,0 +1,111 @@
+<!-- ============================================================
+USAGE — Simple SVG charts (bar, line, dot)
+
+Inline the <script> block below before </body>. Then in the body:
+
+  <div class="chart" id="my-chart"></div>
+
+  <script>
+    chartBar(document.getElementById('my-chart'), {
+      data: [{label: 'A', value: 3}, {label: 'B', value: 7}, {label: 'C', value: 5}],
+      yLabel: 'count (↑ higher is better)'
+    });
+
+    chartLine(container, {
+      data: [{x: 1, y: 2}, {x: 2, y: 5}, {x: 3, y: 3}],
+      xLabel: 'epoch', yLabel: 'loss (↓ lower is better)'
+    });
+
+    chartDot(container, { data: [{x: 0.2, y: 1.1}, {x: 0.5, y: 0.9}, ...],
+                          xLabel: 'x', yLabel: 'y' });
+  </script>
+
+Always pass xLabel / yLabel — every chart needs axis labels and units, and
+↑ / ↓ arrows for "higher/lower is better" when comparing metrics.
+============================================================ -->
+
+<script>
+(function () {
+  const W = 480, H = 240, PAD = { t: 16, r: 16, b: 38, l: 50 };
+  const PLOT_W = W - PAD.l - PAD.r, PLOT_H = H - PAD.t - PAD.b;
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+
+  function svg() {
+    const s = document.createElementNS(SVG_NS, 'svg');
+    s.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    return s;
+  }
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(SVG_NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function fmt(v) {
+    if (Number.isInteger(v)) return String(v);
+    const abs = Math.abs(v);
+    if (abs >= 100) return v.toFixed(0);
+    if (abs >= 10)  return v.toFixed(1);
+    return v.toFixed(2);
+  }
+  function axes(s, xLabel, yLabel, yMin, yMax) {
+    s.append(el('line', { class: 'axis-line', x1: PAD.l, y1: H - PAD.b, x2: W - PAD.r, y2: H - PAD.b }));
+    s.append(el('line', { class: 'axis-line', x1: PAD.l, y1: PAD.t,     x2: PAD.l,     y2: H - PAD.b }));
+    if (xLabel) s.append(el('text', { class: 'axis-label', x: PAD.l + PLOT_W / 2, y: H - 6, 'text-anchor': 'middle' }, xLabel));
+    if (yLabel) {
+      const cy = PAD.t + PLOT_H / 2;
+      s.append(el('text', { class: 'axis-label', x: 12, y: cy, 'text-anchor': 'middle', transform: `rotate(-90 12 ${cy})` }, yLabel));
+    }
+    for (let i = 0; i <= 4; i++) {
+      const v = yMin + (yMax - yMin) * i / 4;
+      const y = H - PAD.b - PLOT_H * i / 4;
+      s.append(el('line', { class: 'grid-line', x1: PAD.l, y1: y, x2: W - PAD.r, y2: y }));
+      s.append(el('text', { class: 'axis-label', x: PAD.l - 6, y: y + 4, 'text-anchor': 'end' }, fmt(v)));
+    }
+  }
+
+  window.chartBar = function (container, opts) {
+    const data = opts.data;
+    const max = Math.max(0, ...data.map(d => d.value));
+    const yMax = max === 0 ? 1 : max * 1.1;
+    const s = svg();
+    axes(s, opts.xLabel, opts.yLabel, 0, yMax);
+    const slot = PLOT_W / data.length, bw = slot * 0.65, gap = slot * 0.35;
+    data.forEach((d, i) => {
+      const x = PAD.l + i * slot + gap / 2;
+      const h = PLOT_H * d.value / yMax;
+      s.append(el('rect', { class: 'bar', x, y: H - PAD.b - h, width: bw, height: h }));
+      s.append(el('text', { class: 'axis-label', x: x + bw / 2, y: H - PAD.b + 14, 'text-anchor': 'middle' }, d.label));
+    });
+    container.replaceChildren(s);
+  };
+
+  window.chartLine = function (container, opts) {
+    const data = opts.data;
+    const xs = data.map(d => d.x), ys = data.map(d => d.y);
+    const xMin = Math.min(...xs), xMax = Math.max(...xs);
+    const yMin = Math.min(0, ...ys), yMax = Math.max(...ys) * 1.1 || 1;
+    const sx = x => PAD.l + (x - xMin) / (xMax - xMin || 1) * PLOT_W;
+    const sy = y => H - PAD.b - (y - yMin) / (yMax - yMin || 1) * PLOT_H;
+    const s = svg();
+    axes(s, opts.xLabel, opts.yLabel, yMin, yMax);
+    const d = data.map((p, i) => `${i ? 'L' : 'M'}${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' ');
+    s.append(el('path', { class: 'line', d }));
+    data.forEach(p => s.append(el('circle', { class: 'dot', cx: sx(p.x), cy: sy(p.y), r: 3 })));
+    container.replaceChildren(s);
+  };
+
+  window.chartDot = function (container, opts) {
+    const data = opts.data;
+    const xs = data.map(d => d.x), ys = data.map(d => d.y);
+    const xMin = Math.min(0, ...xs), xMax = Math.max(...xs) * 1.05 || 1;
+    const yMin = Math.min(0, ...ys), yMax = Math.max(...ys) * 1.05 || 1;
+    const sx = x => PAD.l + (x - xMin) / (xMax - xMin || 1) * PLOT_W;
+    const sy = y => H - PAD.b - (y - yMin) / (yMax - yMin || 1) * PLOT_H;
+    const s = svg();
+    axes(s, opts.xLabel, opts.yLabel, yMin, yMax);
+    data.forEach(p => s.append(el('circle', { class: 'dot', cx: sx(p.x), cy: sy(p.y), r: 4 })));
+    container.replaceChildren(s);
+  };
+})();
+</script>

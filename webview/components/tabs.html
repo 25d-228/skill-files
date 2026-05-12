@@ -1,0 +1,38 @@
+<!-- ============================================================
+USAGE — Click-driven tabs
+
+When you have categorical alternatives that don't all fit on screen
+(e.g. "Python | TypeScript | Rust" code samples, or 4 model variants),
+use a .tabs block. CSS classes are already in style.css.
+
+Markup:
+
+  <div class="tabs">
+    <div class="tab-labels">
+      <div class="tab-label is-active" data-tab="t1">Python</div>
+      <div class="tab-label"           data-tab="t2">TypeScript</div>
+      <div class="tab-label"           data-tab="t3">Rust</div>
+    </div>
+    <div class="tab-panel is-active" data-panel="t1">
+      <pre><code class="language-python">...</code></pre>
+    </div>
+    <div class="tab-panel" data-panel="t2">...</div>
+    <div class="tab-panel" data-panel="t3">...</div>
+  </div>
+
+Then inline the <script> below once near </body>.
+============================================================ -->
+
+<script>
+document.querySelectorAll('.tabs').forEach(tabs => {
+  const labels = tabs.querySelectorAll('.tab-label');
+  const panels = tabs.querySelectorAll('.tab-panel');
+  labels.forEach(lab => {
+    lab.addEventListener('click', () => {
+      const id = lab.dataset.tab;
+      labels.forEach(l => l.classList.toggle('is-active', l.dataset.tab   === id));
+      panels.forEach(p => p.classList.toggle('is-active', p.dataset.panel === id));
+    });
+  });
+});
+</script>

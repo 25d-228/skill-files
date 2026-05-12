@@ -1,0 +1,67 @@
+<!-- ============================================================
+USAGE — Heatmap (table with colored cells, intensity ∝ value)
+
+Inline the <script> block below before </body>. Then in the body:
+
+  <div id="attn-heatmap"></div>
+
+  <script>
+    heatmap(document.getElementById('attn-heatmap'), {
+      matrix: [[0.1, 0.7, 0.2],
+               [0.3, 0.3, 0.4],
+               [0.0, 0.2, 0.8]],
+      rowLabels: ['the', 'cat', 'sat'],
+      colLabels: ['the', 'cat', 'sat'],
+      decimals: 2,                       // optional, default 2
+      color:    [38, 139, 210],          // optional RGB, default Solarized blue
+      max:      null                     // optional, default = max(|matrix|)
+    });
+  </script>
+
+Cell colors scale from transparent at 0 to fully tinted at max.
+Negative values get desaturated and use a second color (red).
+============================================================ -->
+
+<script>
+(function () {
+  window.heatmap = function (container, opts) {
+    const m = opts.matrix;
+    const rows = opts.rowLabels || m.map((_, i) => i);
+    const cols = opts.colLabels || (m[0] || []).map((_, j) => j);
+    const decimals = opts.decimals != null ? opts.decimals : 2;
+    const col = opts.color || [38, 139, 210];    // Solarized blue
+    const neg = opts.negColor || [220, 50, 47];  // Solarized red
+    const max = opts.max != null ? opts.max : Math.max(1e-9, ...m.flat().map(Math.abs));
+
+    const table = document.createElement('table');
+    table.className = 'heatmap';
+
+    const thead = table.createTHead();
+    const trh = thead.insertRow();
+    trh.appendChild(document.createElement('th'));
+    cols.forEach(c => {
+      const th = document.createElement('th');
+      th.textContent = c;
+      trh.appendChild(th);
+    });
+
+    const tbody = table.createTBody();
+    m.forEach((row, i) => {
+      const tr = tbody.insertRow();
+      const lab = tr.insertCell();
+      lab.className = 'hm-label';
+      lab.textContent = rows[i];
+      row.forEach(v => {
+        const td = tr.insertCell();
+        td.textContent = v.toFixed(decimals);
+        const t = Math.min(1, Math.abs(v) / max);
+        const c = v < 0 ? neg : col;
+        td.style.background = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${0.06 + 0.6 * t})`;
+      });
+    });
+
+    container.replaceChildren(table);
+    return table;
+  };
+})();
+</script>

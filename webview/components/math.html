@@ -1,0 +1,30 @@
+<!-- ============================================================
+USAGE — Math rendering with KaTeX
+
+When the page contains math notation:
+1. Inline the three tags below into <head>.
+2. In the body, write math with these delimiters:
+     $a + b$        inline math
+     $$a + b$$      display math (centered, larger)
+3. KaTeX auto-renders after page load. No <script> calls needed.
+
+Example body usage:
+    <p>Softmax: $\text{softmax}(x)_i = e^{x_i} / \sum_j e^{x_j}$.</p>
+    <p>$$\alpha_{ij} = \frac{\exp(e_{ij})}{\sum_k \exp(e_{ik})}$$</p>
+
+KaTeX docs: https://katex.org/
+============================================================ -->
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer
+        src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer
+        src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$',  right: '$',  display: false}
+          ],
+          throwOnError: false
+        });"></script>

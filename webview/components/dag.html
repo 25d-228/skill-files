@@ -1,0 +1,121 @@
+<!-- ============================================================
+USAGE — Auto-laid-out node-link diagram (DAG) with D3 + dagre
+
+USE THIS ONLY WHEN MERMAID CAN'T DO IT. Prefer Mermaid for:
+  flowchart, sequenceDiagram, classDiagram (UML), stateDiagram-v2,
+  erDiagram, gantt, gitGraph, mindmap, timeline, pie
+
+Use this snippet when you need:
+  - Custom node shapes/labels Mermaid doesn't support
+  - Programmatic control over node attributes
+  - Edges with rich labels and weights
+
+Inline the <script> tags below (after </body> ideally, in <head> if defer).
+Then in the body:
+
+  <div class="dag" id="my-graph"></div>
+
+  <script>
+    renderDag(document.getElementById('my-graph'), {
+      rankdir: 'LR',                    // 'TB' | 'BT' | 'LR' | 'RL'
+      nodes: [
+        { id: 'a', label: 'Input' },
+        { id: 'b', label: 'Hidden' },
+        { id: 'c', label: 'Output' }
+      ],
+      edges: [
+        { from: 'a', to: 'b', label: 'W_1' },
+        { from: 'b', to: 'c', label: 'W_2' }
+      ]
+    });
+  </script>
+
+dagre docs: https://github.com/dagrejs/dagre
+============================================================ -->
+
+<script src="https://cdn.jsdelivr.net/npm/@dagrejs/dagre@1.1.4/dist/dagre.min.js"></script>
+<script>
+(function () {
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(SVG_NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // Rectangle-ray intersection: where does a ray from rect center toward
+  // (tx, ty) cross the rect boundary?
+  function boundary(cx, cy, w, h, tx, ty) {
+    const dx = tx - cx, dy = ty - cy;
+    if (dx === 0 && dy === 0) return { x: cx, y: cy };
+    const t = Math.min(
+      Math.abs(dx) > 1e-9 ? (w / 2) / Math.abs(dx) : Infinity,
+      Math.abs(dy) > 1e-9 ? (h / 2) / Math.abs(dy) : Infinity
+    );
+    return { x: cx + dx * t, y: cy + dy * t };
+  }
+
+  window.renderDag = function (container, model) {
+    const g = new dagre.graphlib.Graph({ multigraph: true });
+    g.setGraph({
+      rankdir: model.rankdir || 'TB',
+      nodesep: model.nodesep || 32,
+      ranksep: model.ranksep || 48,
+      marginx: 12, marginy: 12
+    });
+    g.setDefaultEdgeLabel(() => ({}));
+
+    model.nodes.forEach(n => {
+      const label = n.label || n.id;
+      const w = n.width  || Math.max(60, label.length * 7 + 20);
+      const h = n.height || 32;
+      g.setNode(n.id, { label, width: w, height: h });
+    });
+    model.edges.forEach((e, i) => {
+      g.setEdge(e.from, e.to, { label: e.label || '' }, String(i));
+    });
+    dagre.layout(g);
+
+    const W = g.graph().width, H = g.graph().height;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H });
+
+    // Edges first (so nodes paint on top)
+    g.edges().forEach(eId => {
+      const e = g.edge(eId);
+      const a = g.node(eId.v), b = g.node(eId.w);
+      const start = boundary(a.x, a.y, a.width, a.height, b.x, b.y);
+      const end   = boundary(b.x, b.y, b.width, b.height, a.x, a.y);
+      const pts = [start, ...(e.points || []).slice(1, -1), end];
+      const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+      svg.append(el('path', { class: 'edge-path', d, 'marker-end': 'url(#arrow)' }));
+      if (e.label) {
+        const mid = pts[Math.floor(pts.length / 2)];
+        svg.append(el('text', { class: 'edge-label', x: mid.x + 4, y: mid.y - 4 }, e.label));
+      }
+    });
+
+    // Arrow marker
+    const defs = el('defs');
+    const marker = el('marker', {
+      id: 'arrow', viewBox: '0 0 10 10', refX: 9, refY: 5,
+      markerWidth: 6, markerHeight: 6, orient: 'auto-start-reverse'
+    });
+    marker.append(el('path', { d: 'M0,0 L10,5 L0,10 z', fill: 'currentColor' }));
+    defs.append(marker);
+    svg.prepend(defs);
+
+    // Nodes
+    g.nodes().forEach(id => {
+      const n = g.node(id);
+      const grp = el('g', { transform: `translate(${n.x - n.width / 2},${n.y - n.height / 2})` });
+      grp.append(el('rect', { class: 'node-rect', x: 0, y: 0, width: n.width, height: n.height, rx: 4, ry: 4 }));
+      grp.append(el('text', { class: 'node-text', x: n.width / 2, y: n.height / 2 + 4, 'text-anchor': 'middle' }, n.label));
+      svg.append(grp);
+    });
+
+    container.replaceChildren(svg);
+    return svg;
+  };
+})();
+</script>
