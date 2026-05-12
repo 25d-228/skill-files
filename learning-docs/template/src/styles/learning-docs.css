@@ -203,6 +203,7 @@ pre.shiki {
   box-shadow: var(--elev-2);
   line-height: 1.7;
   overflow-x: auto;
+  tab-size: 2;
 }
 
 /* ============================================

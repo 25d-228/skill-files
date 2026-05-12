@@ -103,6 +103,24 @@ Do this silently if the server is already up (no need to narrate a successful he
 
 After this check passes, every subsequent invocation just runs the normal per-file workflow.
 
+### Port collision (WSL + Windows, multiple Astro projects)
+
+`4321` is Astro's default. On WSL, if a Windows-side process (another Astro app, another tool) already binds 4321, browser requests to `localhost:4321` hit the Windows process first — never reach WSL. Same hazard if the user runs multiple learning-docs projects in parallel.
+
+Symptom: the curl-200 probe passes (you bound to 4321 in WSL and your own request loops back fine), but the user's browser shows a different page.
+
+Fix: bake a per-project port into `astro.config.mjs` and re-derive every URL in the workflow from it.
+
+```js
+// docs/learning/astro.config.mjs
+export default defineConfig({
+  server: { host: '0.0.0.0', port: 4380 },  // 0.0.0.0 helps WSL2 mirrored-mode reach the server
+  // ...
+});
+```
+
+When you change the port, also update the curl probe and the URL you give the user. Pick something adjacent to 4321 but unlikely to collide (`4380`, `4322`, etc.) — write it once in `astro.config.mjs` and treat that as the source of truth for the rest of the session.
+
 ## Per-file workflow
 
 For each source file to be documented:
@@ -339,6 +357,10 @@ What happens when the user clicks a token:
 4. **`<Annotations>` + `<A>` components** render to a hidden `<aside class="annotations" hidden>` containing one `<div data-anno="id" data-kind="...">…rendered Markdown…</div>` per annotation.
 5. **Astro emits static HTML** combining page chrome + code block + hidden aside, plus the shared `learning-docs.css` and bundled `learning-docs.js`.
 6. **Browser runtime** — `learning-docs.js` listens for clicks on `[data-tip]`, finds the matching `[data-anno]`, clones its content into a `.tip` popover positioned next to the clicked token. The first `<pre>` in the cloned content becomes the Example tab; the rest is the Explanation. Esc closes; viewport-aware positioning keeps the popover on-screen.
+
+### Transformer edits require a server restart
+
+`tooltipTransformer.ts` is loaded by Astro at config-evaluation time, not per-request. `.mdx` edits, `.astro` edits, and CSS edits hot-reload; edits to `tooltipTransformer.ts` (or `astro.config.mjs`) do **not** — the running Vite worker keeps the old module. Stop the dev-server background task and re-run `npm run dev` after touching the transformer or config.
 
 ## What this skill does NOT do
 
