@@ -122,6 +122,72 @@
     if (e.key === 'Escape') close();
   });
 
+  // ----- Copy buttons -----------------------------------------------------
+
+  const COPY_ICON_SVG =
+    '<svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+  const CHECK_ICON_SVG =
+    '<svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+
+  function injectCodeCopyButtons() {
+    const pres = document.querySelectorAll('main pre.astro-code, main pre.shiki');
+    pres.forEach(pre => {
+      if (pre.closest('.annotations')) return;
+      if (pre.querySelector('.copy-code-btn')) return;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copy-btn copy-code-btn';
+      btn.setAttribute('aria-label', 'Copy code');
+      btn.innerHTML = COPY_ICON_SVG + CHECK_ICON_SVG;
+      pre.appendChild(btn);
+    });
+  }
+
+  function getCopyText(btn) {
+    if (btn.dataset.copyText) return btn.dataset.copyText;
+    if (btn.classList.contains('copy-code-btn')) {
+      const pre = btn.closest('pre');
+      if (!pre) return '';
+      const code = pre.querySelector('code') || pre;
+      return code.innerText.replace(/\s+$/, '');
+    }
+    return '';
+  }
+
+  async function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try { await navigator.clipboard.writeText(text); return true; } catch {}
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  document.addEventListener('click', async e => {
+    const btn = e.target.closest('.copy-btn');
+    if (!btn) return;
+    e.stopPropagation();
+    const text = getCopyText(btn);
+    if (!text) return;
+    const ok = await copyToClipboard(text);
+    if (!ok) return;
+    btn.classList.add('copied');
+    setTimeout(() => btn.classList.remove('copied'), 1400);
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectCodeCopyButtons);
+  } else {
+    injectCodeCopyButtons();
+  }
+
   function reposition() {
     if (activeTok && popover && popover.style.display !== 'none') {
       position(popover, activeTok);

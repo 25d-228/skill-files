@@ -32,7 +32,7 @@ docs/learning/
     ├── styles/
     │   └── learning-docs.css
     ├── scripts/
-    │   └── learning-docs.js            # popover click handler
+    │   └── learning-docs.js            # popover + copy buttons
     └── pages/
         └── index.astro                 # home with file tree (starts empty)
 ```
@@ -186,7 +186,7 @@ let /*[t:let-bind]*/ hklm = RegKey::predef /*[t:assoc-fn]*/ (HKEY_LOCAL_MACHINE 
 
 ### Required pieces
 
-- **Frontmatter** — `title` (the real source path, used in the app bar) and `layout` (always `'@/layouts/PageLayout.astro'`).
+- **Frontmatter** — `title` (the real source path — appears in the app bar **and is what the copy-path button puts on the clipboard**) and `layout` (always `'@/layouts/PageLayout.astro'`).
 - **Component import** — one line: `import { Annotations, A, Summary } from '@/components/learning-docs';`.
 - **`<Summary>`** — one short paragraph framing the file. Renders as the pre-summary card.
 - **Fenced code block** — the real source file's content (or the relevant excerpt), with `/*[t:id]*/` markers tagging the tokens that will have tooltips.
@@ -309,6 +309,53 @@ There are three states. The chip class swap is the *entire* signaling system —
 **The rule at the start of every slice:** before writing new MDX content, walk the index and flip every `chip updated` → `chip done`. That clears the "fresh" marker from the previous slice. Then, as you touch each file in the new slice, set its chip to `chip updated`. Files that get a brand-new `.mdx` for the first time (was `todo`) go straight to `updated`, skipping `done`.
 
 After this routine, exactly the files modified during the current slice show the yellow `updated` chip, and the user can scan the home tree to know what's fresh.
+
+## Page chrome (built-in)
+
+Every per-file `.mdx` page renders inside `PageLayout.astro`, which ships a small set of always-on UI affordances. The agent never adds markup for these — they come for free with the template.
+
+### Sticky app bar (top of every per-file page)
+
+- **Back button** (left) — circular icon, navigates to `/` (the home file tree).
+- **Title** (middle, monospace) — the file path from `frontmatter.title`. Clicking it also navigates to `/`.
+- **Copy-path button** (right) — small ghost button with a clipboard icon. Always visible. Reads its `data-copy-text` attribute (set by the layout from `frontmatter.title`) and writes it to the clipboard, then flashes a green checkmark for ~1.4s.
+
+The copy-path button is only as useful as `frontmatter.title` is accurate — that's why "title is the real source path" is enforced under Required pieces.
+
+### Copy-code button (one per Shiki `<pre>`)
+
+- Injected by `learning-docs.js` on `DOMContentLoaded` — there's no markup in the MDX for it.
+- Selector for insertion: `main pre.astro-code, main pre.shiki`, **excluding** any `<pre>` whose ancestor is `.annotations` (the hidden tooltip-content aside).
+- Positioned at the top-right of the `<pre>` (the `<pre>` is `position: relative` for this).
+- Hidden by default; fades in on `<pre>:hover`, on focus, and while the "copied" state is active.
+- Copies the `<pre>`'s rendered text (`code.innerText`, trailing whitespace trimmed). Marker comments have already been stripped by `tooltipTransformer.preprocess`, so the clipboard receives the clean source the user sees.
+- Same green-checkmark flash on success.
+
+### Where buttons do NOT appear
+
+- The home index page (`IndexLayout.astro`) has no copy buttons — there's no single "path" or "code" for a file tree.
+- The fenced code blocks inside `<A>` annotation bodies (which become the Example tab) are not given copy-code buttons, because they live inside the tooltip popover where copy doesn't make sense.
+
+### Implementation crib
+
+Anything related to the buttons lives in three files; if you need to change behavior, the agent edits these (and mirrors into the skill `template/`):
+
+| File | Holds |
+|---|---|
+| `src/layouts/PageLayout.astro` | The `<header class="app-bar">` markup, including the `<button class="copy-btn copy-path-btn">` with `data-copy-text={title}`. |
+| `src/styles/learning-docs.css` | `.copy-btn`, `.copy-btn.copied`, `.copy-path-btn`, plus the `pre.astro-code .copy-btn.copy-code-btn` overlay rules. |
+| `src/scripts/learning-docs.js` | `injectCodeCopyButtons()`, `getCopyText()`, `copyToClipboard()`, and the document-level `.copy-btn` click handler. |
+
+The Clipboard API is used when available (`navigator.clipboard.writeText`); the script falls back to a hidden `<textarea>` + `document.execCommand('copy')` so the buttons work even when the page isn't served over HTTPS.
+
+### No agent action required
+
+When the agent writes a new `.mdx`, both buttons appear automatically as long as:
+
+1. `frontmatter.title` is set to the real source path (Required pieces).
+2. The page uses `layout: '@/layouts/PageLayout.astro'`.
+
+If a future agent finds a page where copy buttons are missing, the first thing to check is whether those two conditions hold.
 
 ## Tooltip granularity
 
