@@ -9,7 +9,6 @@
     popover.className = 'tip';
     popover.setAttribute('role', 'tooltip');
     popover.style.display = 'none';
-    popover.addEventListener('click', e => e.stopPropagation());
     document.body.appendChild(popover);
     return popover;
   }
