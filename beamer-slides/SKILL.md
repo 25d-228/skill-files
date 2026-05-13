@@ -51,5 +51,5 @@ Apply these conventions when writing or reviewing academic Beamer decks. They co
 
 ## Datasets and publication
 
-- When introducing a dataset, show an **example**, its **size**, and the **language(s)** when relevant.
+- When introducing a dataset, show an **example**, its **size**, and the **language(s)** when relevant. Refer to languages by their **ISO 639 code** literally and in **lowercase** (e.g. `en`, `de`, `pl`) — codes are case-sensitive, and lowercase is the canonical form. Not "English", "German", "Polish".
 - Be honest about publication status — say **"only on arXiv"** if that's the case.

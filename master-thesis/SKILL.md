@@ -44,6 +44,8 @@ Updates to an existing thesis that loads `styles/ebmtnlplab`, `styles/analogy`, 
 
 **Code listings.** Python via `minted`. `-shell-escape` and `pygmentize` are already configured; if a listing fails to compile, surface the error rather than reconfiguring the build.
 
+**Languages.** When referring to a language (e.g. of a dataset, corpus, or text), use the **ISO 639 code** literally and in **lowercase** (e.g. `en`, `de`, `pl`) — codes are case-sensitive, and lowercase is the canonical form. Not "English", "German", "Polish".
+
 **Required-appendix entries.**
 - Publications: `\item \bibentry{key}` (key must exist in `thesis.bib`; duplicate-`\bibitem` warning is expected).
 - List of programs: brief note + pointer to where code lives.
