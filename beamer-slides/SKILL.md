@@ -8,6 +8,7 @@ Apply these conventions when writing or reviewing academic Beamer decks. They co
 
 - Prefer neutral, comparative wording: **higher/lower on metric X**, not vague "good/bad" or "better/worse".
 - **Give examples** — illustrate abstract concepts with concrete instances on the slide, not just definitions.
+- Use **plain academic vocabulary**, not fancy or ornamental words. Avoid thesaurus-flavored upgrades that add syllables without adding precision.
 
 ## Visual design
 

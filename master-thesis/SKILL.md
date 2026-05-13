@@ -32,6 +32,8 @@ Updates to an existing thesis that loads `styles/ebmtnlplab`, `styles/analogy`, 
 
 ## Conventions (when adding content)
 
+**Vocabulary.** Use plain academic wording, not fancy or ornamental words. Avoid thesaurus-flavored upgrades that add syllables without adding precision.
+
 **Citations.** `\cite{key}` for "Author (Year)" as sentence subject; `\citep{key}` for "(Author, Year)" asides. Always prefix with `~`. Match the existing `thesis.bib` key style. ASCII `--` for page ranges.
 
 **Labels.** `chapter:`, `section:`, `subsection:`, `figure:`, `table:` (or `tab:` if the chapter uses that). Reference with `~\ref{...}`.
