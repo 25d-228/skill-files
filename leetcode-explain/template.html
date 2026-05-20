@@ -1,0 +1,977 @@
+<!doctype html>
+<!--
+  leetcode-explain TEMPLATE.
+  This is a working page for problem 167 used as a structural + stylistic
+  reference. When adapting for a new problem, copy this file to
+  docs/<id>-<slug>.html (relative to the current working directory; <id> is
+  the questionFrontendId zero-padded to 4 digits, e.g.
+  docs/0167-two-sum-ii-input-array-is-sorted.html) and replace the
+  problem-specific content (title/h1/subtitle, problem-summary prose,
+  key-insight callout, algorithm <ol>, the .wt[data-id="exN"] cards,
+  MODELS / STEPS objects in the trailing <script>, the implementation code,
+  and the complexity table). Keep all CSS, the d3/Prism script tags, the
+  walkthrough engine, the renderer helpers, and the overall HTML structure
+  unchanged. See SKILL.md for the full workflow.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>167. Two Sum II - Input Array Is Sorted</title>
+<style>
+:root {
+  --base03:  #002b36;
+  --base02:  #073642;
+  --base01:  #586e75;
+  --base00:  #657b83;
+  --base0:   #839496;
+  --base1:   #93a1a1;
+  --base2:   #eee8d5;
+  --base3:   #fdf6e3;
+  --yellow:  #b58900;
+  --orange:  #cb4b16;
+  --red:     #dc322f;
+  --magenta: #d33682;
+  --violet:  #6c71c4;
+  --blue:    #268bd2;
+  --cyan:    #2aa198;
+  --green:   #859900;
+
+  --bg:        var(--base3);
+  --bg-elev:   #fbf3da;
+  --bg-row:    #f6efd4;
+  --bg-hover:  var(--base2);
+  --fg:        var(--base01);
+  --fg-soft:   var(--base00);
+  --fg-muted:  var(--base1);
+  --border:    #ddd5b8;
+  --accent:    var(--blue);
+  --header-bg: var(--base02);
+  --header-fg: var(--base3);
+  --code-bg:   rgba(101, 123, 131, 0.12);
+  --tag-fg:    var(--base3);
+  --tag-muted-bg: var(--base01);
+  --diff-add-bg:    rgba(133, 153, 0, 0.18);
+  --diff-remove-bg: rgba(220, 50, 47, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        var(--base03);
+    --bg-elev:   var(--base02);
+    --bg-row:    #04303d;
+    --bg-hover:  #0d4a5b;
+    --fg:        var(--base1);
+    --fg-soft:   var(--base0);
+    --fg-muted:  var(--base01);
+    --border:    #0a3a48;
+    --accent:    var(--blue);
+    --header-bg: #001f27;
+    --header-fg: var(--base2);
+    --code-bg:   rgba(147, 161, 161, 0.12);
+    --tag-muted-bg: var(--base0);
+    --diff-add-bg:    rgba(133, 153, 0, 0.22);
+    --diff-remove-bg: rgba(220, 50, 47, 0.25);
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  max-width: 1300px;
+  margin: 1.5rem auto;
+  padding: 0 1rem 3rem;
+  line-height: 1.55;
+}
+
+h1 { font-size: 1.6rem; margin: 0 0 0.25rem 0; color: var(--fg); }
+h2 {
+  font-size: 1.2rem;
+  margin: 2rem 0 0.5rem 0;
+  border-left: 4px solid var(--accent);
+  padding-left: 0.6rem;
+  color: var(--fg);
+}
+h3 {
+  font-size: 1.0rem;
+  margin: 1.6rem 0 0.4rem 0;
+  font-weight: 600;
+  color: var(--fg);
+}
+h2 .h2-sub { font-weight: normal; color: var(--fg-muted); font-size: 0.88rem; }
+.subtitle { color: var(--fg-soft); margin: 0 0 0.5rem 0; }
+.date     { color: var(--fg-muted); font-size: 0.85rem; margin: 0 0 1.5rem 0; }
+.intro    { color: var(--fg-soft); margin: 0.5rem 0 1rem 0; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-elev);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  font-size: 0.92rem;
+}
+th, td {
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+}
+thead th {
+  background: var(--header-bg);
+  color: var(--header-fg);
+  font-weight: 600;
+  font-size: 0.92rem;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+tbody tr:nth-child(even) { background: var(--bg-row); }
+tbody tr:hover { background: var(--bg-hover); }
+tbody td:first-child { font-weight: 600; color: var(--fg); }
+
+code {
+  background: var(--code-bg);
+  color: var(--cyan);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.88em;
+  font-family: "Fira Code", Menlo, Consolas, monospace;
+}
+
+.tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 3px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--tag-fg);
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.tag-blue    { background: var(--blue); }
+.tag-violet  { background: var(--violet); }
+.tag-magenta { background: var(--magenta); }
+.tag-green   { background: var(--green); }
+.tag-orange  { background: var(--orange); }
+.tag-cyan    { background: var(--cyan); }
+.tag-yellow  { background: var(--yellow); }
+.tag-red     { background: var(--red); }
+.tag-muted   { background: var(--tag-muted-bg); }
+
+.badge {
+  display: inline-block;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: var(--bg-elev);
+  color: var(--fg-muted);
+  border: 1px solid var(--border);
+}
+
+.callout {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  color: var(--fg);
+}
+.callout-title { font-weight: 700; margin-bottom: 0.3rem; color: var(--fg); }
+.callout-info    { border-left-color: var(--blue); }
+.callout-tip     { border-left-color: var(--green); }
+.callout-warning { border-left-color: var(--yellow); }
+.callout-danger  { border-left-color: var(--red); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin: 1rem 0;
+}
+.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.card-title { font-weight: 700; color: var(--fg); font-size: 0.98rem; margin-bottom: 0.4rem; }
+.card-meta  { color: var(--fg-muted); font-size: 0.82rem; margin-bottom: 0.4rem; }
+
+.timeline { list-style: none; padding: 0 0 0 0.5rem; margin: 1rem 0; border-left: 2px solid var(--border); }
+.timeline > li { position: relative; padding: 0.1rem 0 0.85rem 1rem; }
+.timeline > li::before {
+  content: "";
+  position: absolute;
+  left: -7px; top: 0.5rem;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+}
+.timeline-date { display: inline-block; font-weight: 600; color: var(--fg-muted); font-size: 0.85rem; margin-right: 0.5rem; }
+
+.mermaid { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; margin: 1rem 0; text-align: center; overflow-x: auto; }
+
+.diff { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 1rem 0; }
+.diff pre {
+  margin: 0;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.65rem 0.85rem;
+  font-family: "Fira Code", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+.diff-before { border-left: 3px solid var(--red); }
+.diff-after  { border-left: 3px solid var(--green); }
+.diff-add    { background: var(--diff-add-bg); display: block; }
+.diff-remove { background: var(--diff-remove-bg); display: block; }
+
+.legend { margin: 1rem 0; padding: 0.75rem 1rem; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 6px; font-size: 0.88rem; line-height: 1.7; }
+.legend strong { color: var(--fg-muted); font-weight: 600; margin-right: 0.5rem; }
+
+.takeaways { margin-top: 2rem; padding: 1.1rem 1.3rem; background: var(--bg-elev); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 6px; }
+.takeaways h2 { border: none; padding: 0; margin-top: 0; }
+.takeaways ol { margin: 0.5rem 0 0 0; padding-left: 1.25rem; }
+.takeaways li { margin-bottom: 0.5rem; }
+.takeaways strong { color: var(--fg); }
+
+.sources { margin-top: 2rem; font-size: 0.85rem; color: var(--fg-muted); }
+.sources a { color: var(--accent); text-decoration: none; }
+.sources a:hover { text-decoration: underline; }
+.sources ul { columns: 2; column-gap: 2rem; padding-left: 1rem; }
+
+.chart { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 6px; padding: 0.85rem 1rem; margin: 1rem 0; }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart .axis-label { fill: var(--fg-muted); font-size: 0.72rem; font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+.chart .axis-line  { stroke: var(--fg-muted); stroke-width: 1; }
+.chart .grid-line  { stroke: var(--border); stroke-width: 1; stroke-dasharray: 2,2; }
+.chart .bar  { fill: var(--blue); }
+.chart .line { fill: none; stroke: var(--blue); stroke-width: 2; }
+.chart .dot  { fill: var(--blue); }
+
+.heatmap { border-collapse: separate; border-spacing: 2px; font-size: 0.85rem; margin: 1rem 0; background: transparent; box-shadow: none; width: auto; }
+.heatmap th, .heatmap td { padding: 0.35rem 0.55rem; text-align: center; vertical-align: middle; border-bottom: none; font-variant-numeric: tabular-nums; }
+.heatmap thead th { background: transparent; color: var(--fg-muted); font-weight: 500; font-size: 0.78rem; position: static; }
+.heatmap tbody td { background: var(--bg-elev); color: var(--fg); border-radius: 3px; }
+.heatmap tbody td.hm-label { background: transparent; color: var(--fg-muted); font-weight: 500; text-align: right; }
+
+.tabs { margin: 1rem 0; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-elev); overflow: hidden; }
+.tab-labels { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border); background: var(--bg); }
+.tab-label { padding: 0.55rem 1rem; cursor: pointer; color: var(--fg-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; user-select: none; font-size: 0.9rem; }
+.tab-label:hover { color: var(--fg); }
+.tab-label.is-active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-panel { display: none; padding: 1rem; }
+.tab-panel.is-active { display: block; }
+
+details { margin: 0.5rem 0; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 4px; padding: 0.5rem 0.85rem; }
+details > summary { cursor: pointer; font-weight: 600; color: var(--fg); list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸  "; color: var(--fg-muted); }
+details[open] > summary::before { content: "▾  "; }
+details > *:not(summary) { margin-top: 0.5rem; }
+
+.dag { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 6px; padding: 0.85rem; margin: 1rem 0; overflow-x: auto; }
+.dag svg { display: block; margin: 0 auto; }
+.dag .node-rect { fill: var(--bg); stroke: var(--fg-muted); stroke-width: 1; }
+.dag .node-text { fill: var(--fg); font-size: 0.82rem; font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+.dag .edge-path { fill: none; stroke: var(--fg-muted); stroke-width: 1.2; }
+.dag .edge-label { fill: var(--fg-muted); font-size: 0.72rem; }
+
+.wt { margin: 1.5rem 0; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem 1.25rem; }
+.wt-pips { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 0.85rem; }
+.wt-pip { min-width: 1.5rem; height: 1.5rem; padding: 0 0.5rem; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 600; background: var(--bg); color: var(--fg-muted); border: 1px solid var(--border); cursor: pointer; user-select: none; }
+.wt-pip.is-active { background: var(--accent); color: var(--header-fg); border-color: var(--accent); }
+.wt-pip.is-past   { background: var(--bg-row); color: var(--fg-soft); }
+.wt-stage-label { font-size: 0.74rem; color: var(--fg-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.3rem; }
+.wt-desc { min-height: 4.5em; color: var(--fg); font-size: 0.95rem; margin-bottom: 0.85rem; }
+.wt-body { min-height: 360px; display: flex; align-items: center; justify-content: center; }
+.wt-controls { display: flex; justify-content: space-between; margin-top: 0.85rem; }
+.wt-btn { padding: 0.4rem 0.9rem; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; color: var(--fg); cursor: pointer; font-size: 0.88rem; font-family: inherit; }
+.wt-btn:hover:not(:disabled) { background: var(--bg-hover); }
+.wt-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.is-dim    { opacity: 0.30; transition: opacity 0.2s; }
+.is-past   { opacity: 0.55; transition: opacity 0.2s; }
+.is-on     { opacity: 1;    transition: opacity 0.2s; }
+.is-active { opacity: 1;    transition: opacity 0.2s; filter: drop-shadow(0 0 4px var(--accent)); }
+
+/* ============ SVG styling for the stepper diagram ============ */
+.lc-svg text.lc-fg      { fill: var(--fg); }
+.lc-svg text.lc-fg-mut  { fill: var(--fg-muted); }
+.lc-svg text.lc-fg-soft { fill: var(--fg-soft); }
+.lc-svg .lc-blue        { fill: var(--blue);    stroke: var(--blue); }
+.lc-svg .lc-magenta     { fill: var(--magenta); stroke: var(--magenta); }
+.lc-svg .lc-red         { fill: var(--red); }
+.lc-svg .lc-green       { fill: var(--green); }
+.lc-svg .lc-box         { fill: var(--bg); stroke: var(--fg-muted); stroke-width: 1.5; }
+.lc-svg .lc-arrow       { stroke-width: 2.5; fill: none; }
+.lc-svg .lc-log         { font-family: "Fira Code", Menlo, Consolas, monospace; font-size: 13px; }
+</style>
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+<script defer
+        src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script defer
+        src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<style>
+/* ============ attention-explainer style walkthrough (overrides webview .wt) ============ */
+
+.wt {
+  --variant: var(--accent);
+  --variant-soft: rgba(38,139,210,0.18);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.1rem 0.9rem;
+  margin: 1.4rem 0;
+}
+.wt[data-color="blue"]    { --variant: var(--blue);    --variant-soft: rgba(38,139,210,0.18); }
+.wt[data-color="magenta"] { --variant: var(--magenta); --variant-soft: rgba(211,54,130,0.18); }
+.wt[data-color="green"]   { --variant: var(--green);   --variant-soft: rgba(133,153,0,0.22); }
+.wt[data-color="orange"]  { --variant: var(--orange);  --variant-soft: rgba(203,75,22,0.20); }
+
+.wt-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.6rem;
+  padding-bottom: 0.6rem; border-bottom: 1px solid var(--border);
+}
+.wt-title-row { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+.wt-section-num { font-family: "Fira Code", monospace; color: var(--variant); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.1em; }
+.wt-title { font-size: 1.0rem; font-weight: 700; color: var(--fg); }
+.wt-paper { font-size: 0.78rem; color: var(--fg-muted); text-align: right; }
+.wt-paper a { color: var(--variant); text-decoration: none; font-weight: 600; }
+.wt-paper a:hover { text-decoration: underline; }
+
+.wt-pipeline {
+  display: flex; gap: 0; padding: 0.4rem 0 0.2rem;
+  overflow-x: auto; margin-bottom: 0.7rem;
+}
+.wt .wt-pip {
+  flex: 1; min-width: 60px; background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 0.3rem 0.2rem; font-family: inherit; position: relative;
+  height: auto; border-radius: 0; color: var(--fg-muted); white-space: normal;
+}
+.wt-pip-circle {
+  width: 30px; height: 30px;
+  box-sizing: content-box;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg-row);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Fira Code", monospace; font-weight: 700; font-size: 0.82rem;
+  color: var(--fg-muted);
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+.wt-pip-label {
+  font-size: 0.68rem; color: var(--fg-muted);
+  font-family: "Fira Code", monospace;
+  text-align: center; line-height: 1.15;
+  text-transform: uppercase; letter-spacing: 0.02em;
+}
+.wt .wt-pip:hover .wt-pip-circle { border-color: var(--variant); color: var(--variant); }
+.wt .wt-pip.done .wt-pip-circle { background: var(--variant-soft); border-color: var(--variant); color: var(--variant); }
+.wt .wt-pip.active .wt-pip-circle {
+  background: var(--variant);
+  border-color: var(--variant);
+  color: white;
+}
+.wt .wt-pip.active .wt-pip-label { color: var(--variant); font-weight: 700; }
+.wt .wt-pip::before {
+  content: "";
+  position: absolute;
+  top: calc(0.3rem + 16px);
+  left: calc(50% + 18px);
+  right: calc(-50% + 18px);
+  height: 2px;
+  background: var(--border);
+  z-index: 1;
+}
+.wt .wt-pip:last-child::before { display: none; }
+.wt .wt-pip.done::before { background: var(--variant); }
+
+.wt-stage {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.6rem;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 0.8rem;
+}
+@media (max-width: 720px) { .wt-stage { grid-template-columns: 1fr; } }
+.wt-arch { background: var(--bg-elev); border-radius: 6px; padding: 0.5rem; display: flex; align-items: center; justify-content: center; }
+.wt-arch svg { display: block; width: 100%; height: auto; max-height: 280px; }
+.wt-data {
+  background: var(--bg-row); border-radius: 6px; padding: 0.8rem 1rem;
+  font-size: 0.85rem; min-height: 200px; color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.wt-data-title { font-family: "Fira Code", monospace; color: var(--variant); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+.wt-data .eqn { text-align: left; margin: 0.4rem 0; color: var(--fg); }
+.wt-data .vals { font-family: "Fira Code", monospace; font-size: 0.82rem; line-height: 1.7; color: var(--fg); white-space: pre-wrap; }
+.wt-data .hi { color: var(--orange); font-weight: 700; }
+.wt-data pre {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  padding: 0.5rem 0.7rem; font-family: "Fira Code", Menlo, Consolas, monospace;
+  font-size: 0.78rem; line-height: 1.55; overflow-x: auto; margin: 0.5rem 0 0;
+}
+.wt-data pre code { background: none; color: inherit; padding: 0; }
+
+.wt .wt-desc {
+  padding: 0.6rem 0.2rem 0.5rem; font-size: 0.92rem;
+  color: var(--fg); min-height: 4em;
+  background: transparent; border: none; border-radius: 0;
+}
+.wt-desc-title { font-weight: 700; color: var(--variant); font-size: 0.92rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+.wt .wt-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.5rem; border-top: 1px solid var(--border);
+  padding-top: 0.6rem; margin-top: 0;
+}
+.wt .wt-btn {
+  background: var(--variant); color: white; border: none; border-radius: 4px;
+  padding: 0.45rem 0.95rem; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: filter 0.15s ease, transform 0.1s ease;
+}
+.wt .wt-btn:hover:not(:disabled) { filter: brightness(1.1); background: var(--variant); }
+.wt .wt-btn:active:not(:disabled) { transform: translateY(1px); }
+.wt .wt-btn:disabled { background: var(--fg-muted); opacity: 0.4; cursor: not-allowed; color: white; }
+.wt-counter { font-size: 0.82rem; color: var(--fg-muted); font-family: "Fira Code", monospace; }
+
+/* ---- d3-rendered SVG element classes (matched to attention-explainer) ---- */
+/* Kill the drop-shadow halo that the inlined webview .is-active rule
+   would otherwise paint around every active group's children (text labels). */
+.wt .is-active { filter: none; }
+
+.arch-node  { transition: opacity 0.25s ease; }
+.arch-node.is-dim    { opacity: 0.18; filter: none; }
+.arch-node.is-past   { opacity: 0.55; filter: none; }
+.arch-node.is-on     { opacity: 1;    filter: none; }
+.arch-node.is-active { opacity: 1;    filter: none; }
+
+/* Active arrow: full opacity, solid stroke — no dashed flow animation */
+.arch-arrow { transition: opacity 0.25s ease; }
+.arch-arrow.is-dim    { opacity: 0; }
+.arch-arrow.is-past   { opacity: 0; }
+.arch-arrow.is-on     { opacity: 1; }
+.arch-arrow.is-active { opacity: 1; filter: none; }
+
+.arch-box { fill: var(--bg-row); stroke: var(--fg-muted); stroke-width: 1.4; }
+.arch-box.is-active { fill: var(--variant-soft); stroke: var(--variant); stroke-width: 2; }
+.arch-box.is-past   { fill: var(--variant-soft); stroke: var(--variant); }
+
+.arch-label { font-family: "Fira Code", Menlo, monospace; font-size: 18px; font-weight: 600; fill: var(--fg); text-anchor: middle; }
+.arch-tok   { font-family: "Fira Code", Menlo, monospace; font-size: 11px; fill: var(--fg-muted); text-anchor: middle; }
+.arch-cap   { font-family: "Fira Code", monospace; font-size: 10px; fill: var(--fg-muted); text-anchor: middle; }
+
+/* Pointer labels — only the active stage's labels are visible (no overlap trail) */
+.lc-ptr-label         { font-family: "Fira Code", Menlo, monospace; font-size: 12px; font-weight: 700; }
+.lc-ptr-label-blue    { fill: var(--blue); }
+.lc-ptr-label-magenta { fill: var(--magenta); }
+.lc-pointer-group.is-past,
+.lc-pointer-group.is-dim  { opacity: 0; }
+
+/* Sum-log rows — persist at full opacity; past rows shift to muted gray.
+   The arrow line and "match" green stay so the trace stays readable. */
+.lc-sum-row              { font-family: "Fira Code", Menlo, monospace; font-size: 13px; font-weight: 500; fill: var(--fg-muted); }
+.lc-log-row.is-past      { opacity: 1; }
+.lc-log-row.is-active .lc-sum-row             { fill: var(--red); font-weight: 600; }
+.lc-log-row.is-active .lc-sum-row.lc-sum-match { fill: var(--green); font-weight: 700; }
+.lc-log-row.is-past .lc-sum-row.lc-sum-match  { fill: var(--green); font-weight: 700; }
+
+/* ---- Prism Solarized theme override (matches attention-explainer) ---- */
+pre[class*="language-"] {
+  background: var(--bg-row);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.55rem 0.75rem;
+  font-family: "Fira Code", Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  overflow-x: auto;
+  margin: 0.5rem 0 0.2rem;
+  color: var(--fg);
+  text-shadow: none;
+}
+code[class*="language-"] {
+  font-family: inherit;
+  color: var(--fg);
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  text-shadow: none;
+}
+.token.comment, .token.prolog, .token.doctype, .token.cdata { color: var(--fg-muted); font-style: italic; }
+.token.punctuation { color: var(--fg-muted); }
+.token.namespace { opacity: 0.7; }
+.token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: var(--orange); }
+.token.selector, .token.attr-name, .token.string, .token.char, .token.inserted { color: var(--green); }
+.token.operator, .token.entity, .token.url, .language-css .token.string { color: var(--cyan); }
+.token.atrule, .token.attr-value, .token.keyword { color: var(--magenta); }
+.token.function, .token.builtin { color: var(--blue); }
+.token.class-name { color: var(--blue); font-weight: 700; }
+.token.regex, .token.important, .token.variable { color: var(--yellow); }
+
+/* ---- Lock to Solarized Light (override dark-mode block from inlined webview style) ---- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        #fdf6e3;
+    --bg-elev:   #fbf3da;
+    --bg-row:    #f6efd4;
+    --bg-hover:  #eee8d5;
+    --fg:        #586e75;
+    --fg-soft:   #657b83;
+    --fg-muted:  #93a1a1;
+    --border:    #ddd5b8;
+    --accent:    #268bd2;
+    --header-bg: #073642;
+    --header-fg: #fdf6e3;
+    --code-bg:   rgba(101, 123, 131, 0.12);
+  }
+}
+
+/* Flatten remaining shadows */
+table        { box-shadow: none; }
+.card        { box-shadow: none; }
+.takeaways   { box-shadow: none; }
+.callout     { box-shadow: none; }
+.paper-graph-card { box-shadow: none; }
+</style>
+</head>
+<body>
+  <h1>167. Two Sum II - Input Array Is Sorted</h1>
+  <p class="subtitle">
+    <span class="tag tag-yellow">Medium</span>
+    · <a href="https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/description/">https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/</a>
+  </p>
+
+  <h2>Problem summary</h2>
+  <p class="intro">
+    Given a <strong>1-indexed</strong> sorted array <code>numbers</code> and a value <code>target</code>,
+    return the indices <code>[i, j]</code> (with <code>i &lt; j</code>) of the two entries whose sum equals
+    <code>target</code>. Exactly one solution exists; the same element cannot be used twice;
+    the solution must use <strong>O(1)</strong> extra space.
+  </p>
+
+  <h2>Key insight</h2>
+  <div class="callout callout-tip">
+    <div class="callout-title">Why two pointers work</div>
+    Because the array is sorted, the sum at <code>(left, right)</code> tells you which side is wrong:
+    if it's too small, only moving <code>left</code> right can grow it; if it's too large, only moving
+    <code>right</code> left can shrink it. Each step rules out one column or row of the pair-sum matrix,
+    so the search collapses in linear time without any extra storage.
+  </div>
+
+  <h2>Algorithm</h2>
+  <ol>
+    <li>Set <code>left = 0</code> and <code>right = numbers.size() - 1</code>.</li>
+    <li>While <code>left &lt; right</code>, compute <code>sum = numbers[left] + numbers[right]</code>.</li>
+    <li>If <code>sum == target</code>, return <code>{left + 1, right + 1}</code> (convert to 1-indexed).</li>
+    <li>If <code>sum &lt; target</code>, increment <code>left</code> — every pair using the current <code>right</code> is now too small.</li>
+    <li>If <code>sum &gt; target</code>, decrement <code>right</code> — every pair using the current <code>left</code> is now too large.</li>
+  </ol>
+
+  <h2>Worked example</h2>
+  <p class="intro">For each of the three examples from the problem description, the array diagram is persistent — step through the pipeline to see what the pointers do at each comparison. Click the pips, use the buttons, or focus a card and press <code>←</code> / <code>→</code>.</p>
+
+  <div class="wt" data-id="ex1" data-color="blue" tabindex="0">
+    <div class="wt-header">
+      <div class="wt-title-row">
+        <span class="wt-section-num">EX 1</span>
+        <span class="tag tag-blue">two pointers</span>
+        <span class="wt-title"><code>numbers = [2,7,11,15]</code>, <code>target = 9</code> → <code>[1, 2]</code></span>
+      </div>
+    </div>
+    <nav class="wt-pipeline"></nav>
+    <div class="wt-stage">
+      <div class="wt-arch"></div>
+      <div class="wt-data"><div class="wt-data-title"></div><div class="wt-data-body"></div></div>
+    </div>
+    <div class="wt-desc"><div class="wt-desc-title"></div><div class="wt-desc-body"></div></div>
+    <div class="wt-controls">
+      <button class="wt-btn wt-prev">← Prev</button>
+      <span class="wt-counter"></span>
+      <button class="wt-btn wt-next">Next →</button>
+    </div>
+  </div>
+
+  <div class="wt" data-id="ex2" data-color="magenta" tabindex="0">
+    <div class="wt-header">
+      <div class="wt-title-row">
+        <span class="wt-section-num">EX 2</span>
+        <span class="tag tag-magenta">two pointers</span>
+        <span class="wt-title"><code>numbers = [2,3,4]</code>, <code>target = 6</code> → <code>[1, 3]</code></span>
+      </div>
+    </div>
+    <nav class="wt-pipeline"></nav>
+    <div class="wt-stage">
+      <div class="wt-arch"></div>
+      <div class="wt-data"><div class="wt-data-title"></div><div class="wt-data-body"></div></div>
+    </div>
+    <div class="wt-desc"><div class="wt-desc-title"></div><div class="wt-desc-body"></div></div>
+    <div class="wt-controls">
+      <button class="wt-btn wt-prev">← Prev</button>
+      <span class="wt-counter"></span>
+      <button class="wt-btn wt-next">Next →</button>
+    </div>
+  </div>
+
+  <div class="wt" data-id="ex3" data-color="green" tabindex="0">
+    <div class="wt-header">
+      <div class="wt-title-row">
+        <span class="wt-section-num">EX 3</span>
+        <span class="tag tag-green">two pointers</span>
+        <span class="wt-title"><code>numbers = [-1,0]</code>, <code>target = -1</code> → <code>[1, 2]</code></span>
+      </div>
+    </div>
+    <nav class="wt-pipeline"></nav>
+    <div class="wt-stage">
+      <div class="wt-arch"></div>
+      <div class="wt-data"><div class="wt-data-title"></div><div class="wt-data-body"></div></div>
+    </div>
+    <div class="wt-desc"><div class="wt-desc-title"></div><div class="wt-desc-body"></div></div>
+    <div class="wt-controls">
+      <button class="wt-btn wt-prev">← Prev</button>
+      <span class="wt-counter"></span>
+      <button class="wt-btn wt-next">Next →</button>
+    </div>
+  </div>
+
+  <h2>Implementation</h2>
+<pre><code class="language-cpp">class Solution {
+public:
+    vector&lt;int&gt; twoSum(vector&lt;int&gt;&amp; numbers, int target) {
+        int left = 0, right = static_cast&lt;int&gt;(numbers.size()) - 1;
+        while (left &lt; right) {
+            int sum = numbers[left] + numbers[right];
+            if (sum == target) return {left + 1, right + 1};
+            if (sum &lt; target) ++left;
+            else              --right;
+        }
+        return {}; // unreachable: problem guarantees exactly one solution
+    }
+};</code></pre>
+
+  <h2>Complexity</h2>
+  <table>
+    <thead><tr><th></th><th>Time</th><th>Space</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>This solution</td>
+        <td><code>O(n)</code> — each step advances one pointer; they meet after at most <code>n − 1</code> moves</td>
+        <td><code>O(1)</code> — two integer indices, no auxiliary structure</td>
+      </tr>
+      <tr>
+        <td>Brute force (for reference)</td>
+        <td><code>O(n²)</code></td>
+        <td><code>O(1)</code></td>
+      </tr>
+      <tr>
+        <td>Hash map (ignores sortedness)</td>
+        <td><code>O(n)</code></td>
+        <td><code>O(n)</code> — violates the O(1) extra-space requirement</td>
+      </tr>
+    </tbody>
+  </table>
+
+<script>
+// =========== d3-rendered two-pointer walkthrough (attention-explainer style) ===========
+
+const MODELS = {
+  ex1: {
+    array: [2, 7, 11, 15],
+    pointerConfigs: [
+      { stage: 1, left: 0, right: 3 },
+      { stage: 2, left: 0, right: 3 },
+      { stage: 3, left: 0, right: 2 },
+      { stage: 4, left: 0, right: 1 }
+    ],
+    sumStages: [
+      { stage: 2, text: 'step 1:  2 + 15 = 17   →   17 > 9, move right left', color: 'var(--red)' },
+      { stage: 3, text: 'step 2:  2 + 11 = 13   →   13 > 9, move right left', color: 'var(--red)' },
+      { stage: 4, text: 'step 3:  2 +  7 =  9   ✓   return [1, 2]',           color: 'var(--green)', match: true }
+    ]
+  },
+  ex2: {
+    array: [2, 3, 4],
+    pointerConfigs: [
+      { stage: 1, left: 0, right: 2 },
+      { stage: 2, left: 0, right: 2 }
+    ],
+    sumStages: [
+      { stage: 2, text: 'step 1:  2 + 4 = 6   ✓   return [1, 3]', color: 'var(--green)', match: true }
+    ]
+  },
+  ex3: {
+    array: [-1, 0],
+    pointerConfigs: [
+      { stage: 1, left: 0, right: 1 },
+      { stage: 2, left: 0, right: 1 }
+    ],
+    sumStages: [
+      { stage: 2, text: 'step 1:  −1 + 0 = −1   ✓   return [1, 2]', color: 'var(--green)', match: true }
+    ]
+  }
+};
+
+const STEPS = {
+  ex1: [
+    { label: 'Init', stage: 1,
+      title: 'Step 1 — Place pointers',
+      desc: 'left starts at index 1 (value 2), right at index 4 (value 15). Each iteration sums these and decides which pointer moves.',
+      dataTitle: 'Initial state',
+      dataBody: `<div class="vals">left  = 0  →  numbers[0] = 2
+right = 3  →  numbers[3] = 15</div>
+<pre><code class="language-cpp">int left  = 0;
+int right = numbers.size() - 1;</code></pre>` },
+    { label: '17', stage: 2,
+      title: 'Step 2 — sum 17, too big',
+      desc: 'Sum is 2 + 15 = 17 > 9. Too large — since the array is sorted, only moving right left can shrink the sum.',
+      dataTitle: 'Compare',
+      dataBody: `<div class="vals">sum = numbers[0] + numbers[3]
+    = 2 + 15
+    = <span class="hi">17</span></div>
+<div class="eqn">17 &gt; 9 → too large → <code>--right</code></div>
+<pre><code class="language-cpp">int sum = numbers[left] + numbers[right];
+if (sum &gt; target) --right;</code></pre>` },
+    { label: '13', stage: 3,
+      title: 'Step 3 — sum 13, still too big',
+      desc: 'Sum is 2 + 11 = 13 > 9. Still too large — decrement right again.',
+      dataTitle: 'Compare',
+      dataBody: `<div class="vals">sum = numbers[0] + numbers[2]
+    = 2 + 11
+    = <span class="hi">13</span></div>
+<div class="eqn">13 &gt; 9 → still too large → <code>--right</code></div>
+<pre><code class="language-cpp">sum = numbers[left] + numbers[right];
+--right;</code></pre>` },
+    { label: 'Match', stage: 4,
+      title: 'Step 4 — sum 9, match',
+      desc: 'Sum is 2 + 7 = 9, matching the target. Return the 1-indexed pair [1, 2].',
+      dataTitle: 'Match — return',
+      dataBody: `<div class="vals">sum = numbers[0] + numbers[1]
+    = 2 + 7
+    = <span style="color: var(--green); font-weight: 700;">9</span> ✓</div>
+<div class="eqn">9 == 9 → return <code>{left + 1, right + 1}</code></div>
+<pre><code class="language-cpp">if (sum == target)
+    return {left + 1, right + 1};
+// → [1, 2]</code></pre>` }
+  ],
+  ex2: [
+    { label: 'Init', stage: 1,
+      title: 'Step 1 — Place pointers',
+      desc: 'left at index 1 (value 2), right at index 3 (value 4).',
+      dataTitle: 'Initial state',
+      dataBody: `<div class="vals">left  = 0  →  numbers[0] = 2
+right = 2  →  numbers[2] = 4</div>
+<pre><code class="language-cpp">int left  = 0;
+int right = numbers.size() - 1;</code></pre>` },
+    { label: 'Match', stage: 2,
+      title: 'Step 2 — sum 6, match',
+      desc: 'Sum is 2 + 4 = 6 — matches the target on the first comparison. Return [1, 3].',
+      dataTitle: 'Match — return',
+      dataBody: `<div class="vals">sum = numbers[0] + numbers[2]
+    = 2 + 4
+    = <span style="color: var(--green); font-weight: 700;">6</span> ✓</div>
+<div class="eqn">6 == 6 → return <code>{left + 1, right + 1}</code></div>
+<pre><code class="language-cpp">if (sum == target)
+    return {left + 1, right + 1};
+// → [1, 3]</code></pre>` }
+  ],
+  ex3: [
+    { label: 'Init', stage: 1,
+      title: 'Step 1 — Place pointers',
+      desc: 'left at index 1 (value −1), right at index 2 (value 0).',
+      dataTitle: 'Initial state',
+      dataBody: `<div class="vals">left  = 0  →  numbers[0] = −1
+right = 1  →  numbers[1] =  0</div>
+<pre><code class="language-cpp">int left  = 0;
+int right = numbers.size() - 1;</code></pre>` },
+    { label: 'Match', stage: 2,
+      title: 'Step 2 — sum −1, match',
+      desc: 'Sum is −1 + 0 = −1, matching the target. Return [1, 2].',
+      dataTitle: 'Match — return',
+      dataBody: `<div class="vals">sum = numbers[0] + numbers[1]
+    = −1 + 0
+    = <span style="color: var(--green); font-weight: 700;">−1</span> ✓</div>
+<div class="eqn">−1 == −1 → return <code>{left + 1, right + 1}</code></div>
+<pre><code class="language-cpp">if (sum == target)
+    return {left + 1, right + 1};
+// → [1, 2]</code></pre>` }
+  ]
+};
+
+function addArrowMarker(svg, id, fill) {
+  svg.append('defs').append('marker')
+    .attr('id', id).attr('viewBox', '0 0 10 10')
+    .attr('refX', 8).attr('refY', 5)
+    .attr('markerWidth', 6).attr('markerHeight', 6)
+    .attr('orient', 'auto-start-reverse')
+    .append('path').attr('d', 'M 0 0 L 10 5 L 0 10 z').attr('fill', fill);
+}
+
+function renderArrayArch(container, model, uniq) {
+  if (!window.d3) { setTimeout(() => renderArrayArch(container, model, uniq), 60); return; }
+
+  const N = model.array.length;
+  const BOX_W = 72, BOX_H = 50, GAP = 16;
+  const PAD_X = 30, PAD_Y = 28;
+  const idxLabelY = PAD_Y - 8;
+  const boxTopY   = PAD_Y;
+  const arrTipY   = boxTopY + BOX_H + 8;
+  const arrEndY   = boxTopY + BOX_H + 38;
+  const arrLabelY = boxTopY + BOX_H + 56;
+  const logStartY = boxTopY + BOX_H + 86;
+
+  const sumCount = (model.sumStages || []).length;
+  const totalW   = PAD_X * 2 + N * BOX_W + (N - 1) * GAP;
+  const totalH   = logStartY + Math.max(sumCount * 22, 18) + 6;
+
+  const root = d3.select(container).html('');
+  const svg = root.append('svg')
+    .attr('viewBox', `0 0 ${totalW} ${totalH}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .style('width', '100%').style('height', 'auto');
+
+  addArrowMarker(svg, `arr-blu-${uniq}`, '#268bd2');
+  addArrowMarker(svg, `arr-mag-${uniq}`, '#d33682');
+
+  const xOf  = i => PAD_X + i * (BOX_W + GAP);
+  const cxOf = i => xOf(i) + BOX_W / 2;
+
+  // index labels
+  const indexG = svg.append('g').attr('class', 'lc-indices');
+  model.array.forEach((_, i) => {
+    indexG.append('text').attr('class', 'arch-tok')
+      .attr('x', cxOf(i)).attr('y', idxLabelY).text(`index ${i + 1}`);
+  });
+
+  // array boxes (always visible, base style)
+  const boxG = svg.append('g').attr('class', 'lc-boxes');
+  model.array.forEach((val, i) => {
+    const g = boxG.append('g').attr('transform', `translate(${xOf(i)}, ${boxTopY})`);
+    g.append('rect').attr('class', 'arch-box')
+      .attr('width', BOX_W).attr('height', BOX_H).attr('rx', 4);
+    g.append('text').attr('class', 'arch-label')
+      .attr('x', BOX_W / 2).attr('y', BOX_H / 2 + 7)
+      .text(String(val));
+  });
+
+  // pointer pairs — each (stage, left, right) is one group; only the active
+  // stage shows, so labels never overlap.
+  const arrG = svg.append('g').attr('class', 'lc-pointers');
+  (model.pointerConfigs || []).forEach(cfg => {
+    const g = arrG.append('g').attr('class', 'arch-node lc-pointer-group').attr('data-stage', cfg.stage);
+    g.append('path').attr('class', 'arch-arrow').attr('data-stage', cfg.stage)
+      .attr('d', `M ${cxOf(cfg.left)} ${arrEndY} L ${cxOf(cfg.left)} ${arrTipY}`)
+      .attr('stroke', '#268bd2').attr('stroke-width', 2.5).attr('fill', 'none')
+      .attr('marker-end', `url(#arr-blu-${uniq})`);
+    g.append('text').attr('class', 'lc-ptr-label lc-ptr-label-blue')
+      .attr('x', cxOf(cfg.left)).attr('y', arrLabelY).attr('text-anchor', 'middle')
+      .text('left');
+    g.append('path').attr('class', 'arch-arrow').attr('data-stage', cfg.stage)
+      .attr('d', `M ${cxOf(cfg.right)} ${arrEndY} L ${cxOf(cfg.right)} ${arrTipY}`)
+      .attr('stroke', '#d33682').attr('stroke-width', 2.5).attr('fill', 'none')
+      .attr('marker-end', `url(#arr-mag-${uniq})`);
+    g.append('text').attr('class', 'lc-ptr-label lc-ptr-label-magenta')
+      .attr('x', cxOf(cfg.right)).attr('y', arrLabelY).attr('text-anchor', 'middle')
+      .text('right');
+  });
+
+  // sum log rows — these persist across stages once revealed (full opacity).
+  const sumG = svg.append('g').attr('class', 'lc-sums');
+  (model.sumStages || []).forEach((s, idx) => {
+    const y = logStartY + idx * 22;
+    const g = sumG.append('g').attr('class', 'arch-node lc-log-row').attr('data-stage', s.stage);
+    g.append('text').attr('class', 'lc-sum-row' + (s.match ? ' lc-sum-match' : ''))
+      .attr('x', PAD_X).attr('y', y)
+      .attr('data-active-fill', s.color || 'var(--fg)')
+      .text(s.text);
+  });
+}
+
+// Walkthrough engine — mirrors attention-explainer's
+document.querySelectorAll('.wt[data-id]').forEach(el => {
+  const id = el.dataset.id;
+  const steps = STEPS[id];
+  const model = MODELS[id];
+  if (!steps || !model) return;
+
+  let cur = 0;
+  const pipelineEl = el.querySelector('.wt-pipeline');
+  const archEl     = el.querySelector('.wt-arch');
+  const dataTitle  = el.querySelector('.wt-data-title');
+  const dataBody   = el.querySelector('.wt-data-body');
+  const descTitle  = el.querySelector('.wt-desc-title');
+  const descBody   = el.querySelector('.wt-desc-body');
+  const counter    = el.querySelector('.wt-counter');
+  const prevBtn    = el.querySelector('.wt-prev');
+  const nextBtn    = el.querySelector('.wt-next');
+
+  renderArrayArch(archEl, model, id);
+
+  // build pips
+  pipelineEl.innerHTML = '';
+  steps.forEach((step, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'wt-pip';
+    btn.setAttribute('aria-label', `Step ${i + 1}: ${step.label}`);
+    btn.innerHTML = `<div class="wt-pip-circle">${i + 1}</div><span class="wt-pip-label">${step.label}</span>`;
+    btn.addEventListener('click', () => { cur = i; render(); });
+    pipelineEl.appendChild(btn);
+  });
+  const pips = pipelineEl.querySelectorAll('.wt-pip');
+
+  function render() {
+    const step = steps[cur];
+    const stage = step.stage;
+
+    archEl.querySelectorAll('[data-stage]').forEach(node => {
+      const s = parseInt(node.dataset.stage, 10);
+      node.classList.remove('is-dim', 'is-past', 'is-on', 'is-active');
+      if (s > stage)        node.classList.add('is-dim');
+      else if (s === stage) node.classList.add('is-active');
+      else                  node.classList.add('is-past');
+    });
+
+    dataTitle.textContent = step.dataTitle || '';
+    dataBody.innerHTML    = step.dataBody  || '';
+    descTitle.textContent = step.title || '';
+    descBody.textContent  = step.desc  || '';
+    counter.textContent   = `Step ${cur + 1} of ${steps.length}`;
+    prevBtn.disabled = cur === 0;
+    nextBtn.disabled = cur === steps.length - 1;
+
+    pips.forEach((p, i) => {
+      p.classList.toggle('active', i === cur);
+      p.classList.toggle('done',   i < cur);
+    });
+
+    if (typeof Prism !== 'undefined' && Prism.highlightAllUnder) {
+      Prism.highlightAllUnder(dataBody);
+    }
+  }
+
+  prevBtn.addEventListener('click', () => { if (cur > 0)                { cur--; render(); } });
+  nextBtn.addEventListener('click', () => { if (cur < steps.length - 1) { cur++; render(); } });
+  el.addEventListener('keydown', (e) => {
+    if (e.target.matches('input, textarea, select')) return;
+    if (e.key === 'ArrowLeft'  && cur > 0)                { cur--; render(); e.preventDefault(); }
+    if (e.key === 'ArrowRight' && cur < steps.length - 1) { cur++; render(); e.preventDefault(); }
+  });
+
+  render();
+});
+</script>
+</body>
+</html>
